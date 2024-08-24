@@ -1,0 +1,58 @@
+<?php
+require_once __DIR__ . "/console/Style.php";
+require_once __DIR__ . "/console/make.php";
+require_once __DIR__ . "/vendor/autoload.php";
+require_once __DIR__ . "/config/index.php";
+require_once __DIR__ . "/database/index.php";
+require_once __DIR__ . "/app/models/UserModel.php";
+
+$commands = [
+    'migrate' => 'Run database migrations',
+    'make {kind} {name}' => 'Create a new model or app',
+    'serve' => 'Start the server',
+    'ws' => 'Run WebSocket server'
+];
+
+switch ($argv[1] ?? null) {
+    case null:
+        fwrite(STDOUT, "Please put at least 1 word after okta \n");
+        fwrite(STDOUT, "Use `php okta -list` to see all commands \n");
+        exit(1);
+        break;
+
+    case 'serve':
+        CLI::info("Starting server at http://" . config('app.url'));
+        shell_exec('php -S ' . config('app.url') . ' -t public');
+        break;
+
+    case 'ws':
+        CLI::info("WebSocket Running on " . config('ws.url'));
+        require_once __DIR__ . "/app/websocket/index.php";
+        break;
+
+    case 'migrate':
+        fwrite(STDOUT, "Running migrations...\n\n");
+        require_once __DIR__ . "/console/migration.php";
+        break;
+
+    case 'test':
+        break;
+    case '-l':
+        Cli::info("available commands\n");
+        Cli::listCommands($commands);
+        fwrite(STDOUT, "\n");
+        break;
+    case '-list':
+        Cli::info("available commands\n");
+        Cli::listCommands($commands);
+        fwrite(STDOUT, "\n");
+        break;
+
+    case 'make':
+        handleMakeCommand($argv);
+        break;
+
+    default:
+        fwrite(STDERR, style()->box("\033[41m", " error ") . " Unknown command `$argv[1]`\033[0m\n");
+        exit(1);
+}
