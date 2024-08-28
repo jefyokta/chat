@@ -4,21 +4,24 @@ namespace oktaa\Database;
 
 use PDO;
 use PDOException;
+use InvalidArgumentException;
+use oktaa\Database\Interfaces\OrderByType;
 
 abstract class Database
 {
-    // Properti kelas
     protected $host;
     protected $db;
     protected $user;
     protected $password;
     protected $port;
     protected $dbh;
+    protected $searchable = [];
     protected $params = [];
     protected string $sql;
     protected string $table;
     protected array $fillable = [];
-    protected array $definition = ["id" => "INT PRIMARY KEY", "name" => "VARCHAR"];
+    protected string $findableColumn = 'id';
+    protected array $definition = ["id" => "INT PRIMARY KEY"];
 
     public function __construct()
     {
@@ -32,8 +35,48 @@ abstract class Database
             $this->dbh = new PDO(config('db.connection') . ":host=$this->host;port=$this->port;dbname=$this->db", $this->user, $this->password);
             $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
-            die("Database connection failed: " . $e->getMessage());
-            exit;
+            throw $e;
+        }
+    }
+    public static function find($value): array
+    {
+
+        $static = new static();
+        $static->sql = "SELECT * FROM $static->table WHERE `$static->findableColumn` = ?";
+        $stat = $static->dbh->prepare($static->sql);
+        $static->params[] = $value;
+        $stat->execute($static->params);
+        $result = $stat->fetch(PDO::FETCH_ASSOC);
+        return $result ? $result : [];
+    }
+    public static function search($value)
+    {
+        $instance = new static();
+
+        if (!is_array($instance->searchable)) {
+            throw new InvalidArgumentException('Searchable must be an Array');
+        }
+        if (count($instance->searchable) < 1) {
+            throw new InvalidArgumentException('There is no searchable column in table ' . $instance->getTableName() . "\n\n set searchable property! \n ex:\n`protected \$searchable = ['columnname'];`");
+        }
+
+        $conditions = [];
+        $params = [];
+        foreach ($instance->searchable as $column) {
+            $conditions[] = "$column LIKE ?";
+            $params[] = "%$value%";
+        }
+
+        $whereClause = implode(' OR ', $conditions);
+        $instance->sql = "SELECT * FROM " . $instance->table . " WHERE $whereClause";
+
+
+        try {
+            $stmt = $instance->dbh->prepare($instance->sql);
+            $stmt->execute($params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\Throwable $th) {
+            throw $th;
         }
     }
 
@@ -66,9 +109,13 @@ abstract class Database
     }
     public function get(): array
     {
-        $stmt = $this->dbh->prepare($this->sql);
-        $stmt->execute($this->params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $stmt = $this->dbh->prepare($this->sql);
+            $stmt->execute($this->params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
     public function first()
     {
@@ -80,10 +127,44 @@ abstract class Database
 
     public function execute(): void
     {
-        $stmt = $this->dbh->prepare($this->sql);
-        $stmt->execute($this->params);
+        try {
+            $stmt = $this->dbh->prepare($this->sql);
+            $stmt->execute($this->params);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
-
+    /**
+     * Inserts multiple rows into the database.
+     *
+     * @param array[] $data — Array of associative arrays to insert.
+     *
+     * Example usage:
+     * $data = [
+     *     ['column1' => 'value1', 'column2' => 'value2'],
+     *     ['column1' => 'value3', 'column2' => 'value4'],
+     * ];
+     * self::insertMany($data);
+     */
+    public static function insertMany(array $data)
+    {
+        foreach ($data as $d) {
+            self::insert($d)->run();
+        }
+    }
+    /**
+     * Update records in the database.
+     *
+     * @param string[] $data An associative array of columns and values to update.
+     * @param string[] $conditions An associative array of conditions to match the records to update.
+     *
+     * @return Database
+     *
+     * Example usage:
+     * $data = ['column' => 'value'];  // Columns to update
+     * $conditions = ['id' => 1];      // Conditions to match the records
+     * self::update($data, $conditions);
+     */
     public static function update(array $data, array $conditions): Database
     {
         $instance = new static();
@@ -98,7 +179,16 @@ abstract class Database
 
         return $instance;
     }
-
+    /**
+     * Insert a row into the database.
+     *
+     * @param array $data — Array of associative array to insert.
+     *
+     * Example usage:
+     * $data = ['column1' => 'value1', 'column2' => 'value2'];
+     * 
+     * self::insert($data);
+     */
     public static function insert(array $data): Database
     {
         $instance = new static();
@@ -127,12 +217,27 @@ abstract class Database
         $instance->run();
         $instance->sql = "CREATE TABLE IF NOT EXISTS " . $instance->table . " (" . $instance->formatDefinition() . ")";
         $instance->run();
+        // $instance->dbh->affectedrows();
+    }
+    public static function getTableName(): ?string
+    {
+        $ins = new static();
+        return $ins->table;
+    }
+    public function raw(string $sql, ?array $params = [])
+    {
+        $this->sql = $sql;
+        $this->params[] = $params;
+        return $this;
     }
 
-    public function run(): void
+    public function run(bool $getaffectedrows = false)
     {
         $stmt = $this->dbh->prepare($this->sql);
         $stmt->execute($this->params);
+        if ($getaffectedrows) {
+            return $stmt->rowCount();
+        }
     }
     public function join(string $table, string $clause): Database
     {
@@ -153,5 +258,14 @@ abstract class Database
         $instance = new static();
         $instance->sql = "SELECT DISTINCT $columns FROM " . $instance->table;
         return $instance;
+    }
+    public function getSql(): ?string
+    {
+        return $this->sql;
+    }
+    public function OrderBy($column, OrderByType $type): Database
+    {
+        $this->sql .= " ORDER BY $column " . $type->value;
+        return $this;
     }
 }

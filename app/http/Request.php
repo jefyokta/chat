@@ -25,7 +25,7 @@ class Request
         $this->ip = $_SERVER["REMOTE_ADDR"] ?? '';
         $this->useragent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
         $this->files = $_FILES ?? [];
-        $this->header = getallheaders() ? getallheaders() : $this->header;
+        // $this->header = getallheaders() ? getallheaders() : $this->header;
         $this->params = $params ?? $this->params;
 
 
@@ -36,9 +36,13 @@ class Request
         $data = file_get_contents("php://input");
         return $data = json_decode($data, true) ?? [];
     }
-    public function query(string $key): string
+    public function query(string $key): ?string
     {
-        return htmlspecialchars($this->query[$key]);
+        $query = $this->query[$key] ?? null;
+        if (!is_null($query)) {
+            return htmlspecialchars($query);
+        }
+        return null;
     }
     public function getData(): array
     {

@@ -2,7 +2,6 @@
 
 namespace oktaa\http\Response;
 
-use oktaa\http\Request\Request;
 
 class Response
 {
@@ -14,15 +13,15 @@ class Response
     public function Json(array $response, int $status = 200): Response
     {
         header("Content-Type: Application/json");
-        echo json_encode($response);
+        echo json_encode($response, JSON_PRETTY_PRINT);
         return $this;
     }
-    public function File(string $imgpath): void
+    public function File(string $filepath): void
     {
-        $this->imgcheck($imgpath);
-        header('Content-Type: ' . mime_content_type($imgpath));
-        header('Content-Length: ' . filesize($imgpath));
-        readfile($imgpath);
+        // $this->imgcheck($imgpath);
+        header('Content-Type: ' . mime_content_type($filepath));
+        header('Content-Length: ' . filesize($filepath));
+        readfile($filepath);
         exit;
     }
 
@@ -52,6 +51,7 @@ class Response
     public function render(string $views, array $data = []): Response
     {
         $data = $data;
+        extract($data);
         require_once __DIR__ . "/../../resources/views/layouts/header.php";
         require_once __DIR__ . "/../../resources/views/$views.php";
         require_once __DIR__ . "/../../resources/views/layouts/footer.php";

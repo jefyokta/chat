@@ -1,12 +1,38 @@
 <?php
 require_once __DIR__ . "/../init.php";
+require_once __DIR__ . "/Routing.php";
 
-use oktaa\model\MessageModel\MessageModel;
 use Swoole\WebSocket\Server;
 use Swoole\Http\Request;
 use Swoole\WebSocket\Frame;
-use oktaa\model\Usermodel\UserModel;
+use oktaa\model\MessageModel;
+use oktaa\model\UserModel;
+use oktaa\Websocket\Routing;
 
+$route = new Routing();
+$route->path('message', function (Server $server, Frame $frame, array $data) {
+    if (isset($data['to'], $data['message'])) {
+        $from = $data['from'];
+        $to = $data['to'];
+        $message = $data['message'];
+
+        try {
+            MessageModel::insert([
+                'from' => $from,
+                'to' => $to,
+                'message' => $message
+            ])->run();
+        } catch (\Exception $e) {
+            $server->push($frame->fd, json_encode(WebsocketResponse([],'error','internal server error')));
+        }
+    } else {
+        $server->push($frame->fd, json_encode([
+            'type' => 'error',
+            'error' => 'Invalid message data',
+            'data' => []
+        ]));
+    }
+});
 
 $server = new Server(config('ws.host'), config('ws.port'));
 
@@ -15,56 +41,46 @@ $server->on('start', function () {
 });
 
 $server->on('open', function (Server $server, Request $request) {
-    go(function($request){
-        echo "Connection opened: {$request->fd}\n";
-    
-    
-        $userid = 1;
-        $userid = 1;
-        $users = UserModel::selectDistinct("users.*")
-            ->join('messages', 'messages.from = users.id OR messages.to = users.id')
-            ->where("messages.from", "=", $userid)
-            ->orWhere("messages.to", "=", $userid)
-            ->andWhere("users.id", "!=", $userid)
-            ->get();
-        foreach ($users as $user):
-            echo $user;
-        endforeach;
-    });
-
+    echo "Connection open: {$request->fd}\n";
 });
 
-$server->on('message', function (Server $server, Frame $frame) {
+$server->on('message', function (Server $server, Frame $frame) use ($route) {
     $messageData = json_decode($frame->data, true);
 
-    var_dump($messageData);
+    if ($messageData === null && json_last_error() !== JSON_ERROR_NONE) {
+        $server->push($frame->fd, json_encode(['error' => 'Invalid JSON format', 'data' => []]));
+        return;
+    }
 
-    if ($messageData) {
-        try {
-            if (!isset($messageData['from'], $messageData['to'], $messageData['message'])) {
-                throw new InvalidArgumentException("Missing required fields");
-            }
+    if (isset($messageData['token'])) {
+        $userid = Auth::TokenVerify($messageData['token']);
+        if (is_array($userid)) {
+            $data = $messageData['data'] ?? [];
+            $data['from'] = $userid['id'];
 
-            MessageModel::insert([
-                'from' => $messageData['from'],
-                'to' => $messageData['to'],
-                'message' => $messageData['message']
-            ])->run();
-        } catch (\PDOException $e) {
-            error_log("Database error: " . $e->getMessage());
-            var_dump($e->getMessage());
-        } catch (\Throwable $th) {
-            error_log("Unexpected error: " . $th->getMessage());
-            var_dump($th->getMessage());
+            $route->addClient($frame->fd, $userid['id']);
+            $route->run($server, $frame, $data);
+        } else {
+            echo 'Invalid credential';
+            $server->push($frame->fd, json_encode([
+                'type' => 'error',
+                'error' => 'Invalid token',
+                'data' => []
+            ]));
         }
     } else {
-        var_dump("Invalid message data received");
+        echo 'No credential';
+        $server->push($frame->fd, json_encode(WebsocketResponse([],'error','invalid credential')));
     }
 });
 
-
-$server->on('close', function ($server, $fd) {
-    echo "Connection closed: {$fd}\n";
+$server->on('close', function (Server $server, int $fd) use ($route) {
+    foreach ($route->clients as $userId => $clientFd) {
+        if ($clientFd === $fd) {
+            $route->removeClient($userId);
+            break;
+        }
+    }
 });
 
 $server->start();

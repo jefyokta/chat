@@ -1,55 +1,268 @@
 <?php
+
+use oktaa\Seeder\Seeder;
+fwrite(STDOUT, "\n");
+
+/**
+ * 
+ * ---------------------------------------
+ * Calling Console Styling                |
+ * ---------------------------------------
+ * 
+ */
 require_once __DIR__ . "/console/Style.php";
+
+/**
+ * 
+ * 
+ * 
+ * ------------------------------------------
+ * Generate keys and env file(if not exist); |
+ * ------------------------------------------
+ * 
+ * 
+ * 
+ */
+
+if ($argv[1] === 'generate-keys') {
+    require_once __DIR__ . "/console/GenerateKeys.php";
+    new GenerateKeys();
+    // break;
+}
+
+/**
+ * Checking For .env Files
+ */
+if (!file_exists(".env")) {
+    Cli::error(" .env File is not found \n");
+    Cli::info(" run `php okta generate-keys` !");
+    exit(1);
+}
+
+/**
+ * 
+ * 
+ * ---------------------------------------
+ * Calling Vendor And App                 |
+ * ---------------------------------------
+ * 
+ * 
+ */
 require_once __DIR__ . "/console/make.php";
 require_once __DIR__ . "/vendor/autoload.php";
-require_once __DIR__ . "/config/index.php";
-require_once __DIR__ . "/database/index.php";
-require_once __DIR__ . "/app/models/UserModel.php";
+require_once __DIR__ . "/app/init.php";
+require_once __DIR__ . "/database/Seeder.php";
 
+
+/**
+ * 
+ * ---------------------------------------
+ * Get app.json file                      |
+ * ---------------------------------------
+ * 
+ * 
+ */
+$app = json_decode(file_get_contents("app.json"), true);
+
+
+/**
+ * 
+ * ---------------------------------------
+ * command list and description           |
+ * ---------------------------------------
+ * 
+ * 
+ */
 $commands = [
     'migrate' => 'Run database migrations',
-    'make {kind} {name}' => 'Create a new model or app',
+    'make {kind} ' => 'Create a new model or app',
     'serve' => 'Start the server',
-    'ws' => 'Run WebSocket server'
+    'ws' => 'Run WebSocket server',
+    'dbseed' => "Seeding Database",
+    'test' => "execute Test::run()"
 ];
 
+/**
+ * 
+ * ---------------------------------------
+ * Extenstions Validations                |
+ * ---------------------------------------
+ * 
+ */
+$extensions = get_loaded_extensions();
+
+$required_extensions = $app['required']['extensions'];
+$extension_errors = [];
+foreach ($required_extensions as $rextenstion):
+    if (!in_array($rextenstion, $extensions)) {
+        array_push($extension_errors, $rextenstion);
+    }
+endforeach;
+
+if (count($extension_errors) > 0) {
+    $extens = implode(" \n ", $extension_errors);
+    Cli::warning(" You need to enable php extension(s): \n\n $extens \n\n");
+}
+/**
+ * 
+ * ---------------------------------------
+ * Warning for DB ASYNC                   |
+ * ---------------------------------------         
+ * This feature will be available soon    |
+ * ---------------------------------------
+ * 
+ */
+if (config('db.async')) {
+    Cli::warning(" DB ASYNC has'nt recomended");
+    if (config('db.connection') !== 'mysql') {
+        Cli::error(" Async Database Only Available in mysql ");
+        exit(1);
+    }
+}
+
+/**
+ * 
+ * 
+ * ---------------------------------------
+ * Commands Handle                        |
+ * ---------------------------------------
+ * 
+ * 
+ */
 switch ($argv[1] ?? null) {
     case null:
-        fwrite(STDOUT, "Please put at least 1 word after okta \n");
-        fwrite(STDOUT, "Use `php okta -list` to see all commands \n");
+        CLI::error("Please put at least 1 word after okta \n");
+        fwrite(STDOUT, "Use `php okta -list` to see all commands \n\n");
         exit(1);
         break;
 
+
+/**
+ * 
+ * ---------------------------------------
+ * Starting Server                        |
+ * ---------------------------------------
+ * 
+ */
     case 'serve':
+        fwrite(STDOUT, "\n");
         CLI::info("Starting server at http://" . config('app.url'));
+        fwrite(STDOUT, "\n");
         shell_exec('php -S ' . config('app.url') . ' -t public');
         break;
-
+    case 'swoole-serve':
+        fwrite(STDOUT, "\n");
+        CLI::info("Starting server at http://" . config('app.url'));
+        fwrite(STDOUT, "\n");
+        require_once __DIR__ . "/public/SwooleServer.php";
+        break;
+/**
+ * 
+ * ---------------------------------------
+ * Starting Websocker Server              |
+ * ---------------------------------------
+ * 
+ */
     case 'ws':
+        $extensions = get_loaded_extensions();
+
+        if (!in_array('openswoole', $extensions)) {
+            Cli::error(" Please enable `openswoole` extension \n");
+            exit(1);
+        }
+
+        fwrite(STDOUT, "\n");
         CLI::info("WebSocket Running on " . config('ws.url'));
+        fwrite(STDOUT, "\n");
         require_once __DIR__ . "/app/websocket/index.php";
         break;
-
+/**
+ * 
+ * ---------------------------------------
+ * Running Database Migration             |
+ * ---------------------------------------
+ * 
+ */
     case 'migrate':
         fwrite(STDOUT, "Running migrations...\n\n");
         require_once __DIR__ . "/console/migration.php";
         break;
 
+
+/**
+ * 
+ * -------------------------------------------------------------
+ * Execute Test::run()                                          |
+ * You Can Write any PHP Script in this method and Run them     |
+ * -------------------------------------------------------------
+ * 
+ */
     case 'test':
-        break;
-    case '-l':
-        Cli::info("available commands\n");
-        Cli::listCommands($commands);
+        require_once __DIR__ . "/app/test/Test.php";
+        $test = new Test();
+        try {
+
+            $test->run();
+        } catch (Exception $th) {
+            Cli::error($th->getMessage());
+        }
         fwrite(STDOUT, "\n");
         break;
+/**
+ * 
+ * ---------------------------------------
+ * Command List                           |
+ * ---------------------------------------
+ * 
+ */
+    case '-l':
     case '-list':
+    case '--list':
         Cli::info("available commands\n");
-        Cli::listCommands($commands);
+        Cli::listCommands($app['commands']);
         fwrite(STDOUT, "\n");
         break;
 
+/**
+ * 
+ * ---------------------------------------
+ * Make File                              |
+ * ---------------------------------------                       
+ * -Model                                 |
+ * -Seeder                                |
+ * -App                                   |
+ * ---------------------------------------
+ * 
+ */
     case 'make':
         handleMakeCommand($argv);
+        break;
+/**
+ * 
+ * ---------------------------------------
+ * Run Seeder::run()                      |
+ * Seeding Database                       |
+ * ---------------------------------------
+ * 
+ */
+    case 'dbseed':
+        $seeder = new Seeder();
+        fwrite(STDOUT, "\n");
+
+        Cli::info(" Seeding Database....");
+        fwrite(STDOUT, "\n");
+
+        try {
+            $seeder->run();
+            fwrite(STDOUT, "\n");
+            Cli::success(" Database Seeded !");
+            fwrite(STDOUT, "\n");
+        } catch (\Throwable $th) {
+            fwrite(STDOUT, "\n");
+            Cli::error($th->getMessage());
+            fwrite(STDOUT, "\n");
+            exit;
+        }
         break;
 
     default:

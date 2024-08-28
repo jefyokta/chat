@@ -1,2 +1,6 @@
 /vendor
 .env
+index.txt
+/public/indexs.php
+.rest
+output

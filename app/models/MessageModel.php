@@ -1,6 +1,10 @@
 <?php
-namespace oktaa\model\MessageModel;
-use oktaa\Database\Database;
+
+namespace oktaa\model;
+
+use oktaa\Database\Database as Database;
+use oktaa\Database\Interfaces\OrderByType;
+
 class MessageModel extends Database
 {
     protected string $table = 'messages';
@@ -13,4 +17,10 @@ class MessageModel extends Database
     ];
     protected array $fillable = ["message", "from", "to"];
     public $name = 'messages';
+
+
+    public static function getOurMessage($myid, $theirid)
+    {
+        return  self::select('*')->where('messages.from', '=', $myid)->orWhere('messages.from', '=', $theirid)->orWhere('messages.to', '=', $myid)->orWhere('messages.to', '=', $theirid)->OrderBy('messages.created_at', OrderByType::ASC)->get();
+    }
 }

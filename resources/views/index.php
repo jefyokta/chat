@@ -113,63 +113,113 @@
         </div>
     </div>
 </div>
+<div id="alert">
 
+</div>
 <script>
-    const userId = 2;
-    const socket = new WebSocket('ws://localhost:9502');
+    document.addEventListener('DOMContentLoaded', function() {
+        const socket = new WebSocket('ws://127.0.0.1:9501');
+        const userId = 2; // Ganti sesuai ID pengguna Anda
 
-    socket.onopen = function() {
-        const userId = '12345';
-        socket.send(JSON.stringify({
-            type: 'auth',
-            
-        }));
-    };
+        const token = getCookie('X-ChatAppAccessToken') || null;
 
-    socket.onmessage = function(event) {
-        const messageData = JSON.parse(event.data);
-        const messages = document.getElementById('messages');
-        const messageElement = document.createElement('div');
+        socket.onopen = function() {
+            if (token) {
+                socket.send(JSON.stringify({
+                    type: 'auth',
+                    token: token
+                }));
+            }
+        };
 
-        if (messageData.user_id === userId) {
-            messageData.isSelf = true;
+        socket.onmessage = function(event) {
+            const messageData = JSON.parse(event.data);
+            console.log(messageData);
+            // const messages = document.getElementById('messages');
+            // const messageElement = document.createElement('div');
+
+            // if (messageData.user_id === userId) {
+            //     messageData.isSelf = true;
+            // }
+
+            // if (messageData.isSelf) {
+            //     messageElement.className = "text-white bg-blue-500 rounded-lg p-2 mb-2 max-w-max ml-auto text-right";
+            // } else {
+            //     messageElement.className = "text-gray-800 bg-gray-200 rounded-lg p-2 mb-2 max-w-max mr-auto text-left";
+            // }
+
+            // messageElement.innerHTML = `<strong>${messageData.user_id}:</strong> ${messageData.text}`;
+            // messages.appendChild(messageElement);
+            // messages.scrollTop = messages.scrollHeight;
+        };
+
+        socket.onclose = function() {
+            const toastHtml = `
+            <div id="toast-danger" class="flex z-50 items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 " role="alert">
+                <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg ">
+                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z"/>
+                    </svg>
+                    <span class="sr-only">Error icon</span>
+                </div>
+                <div class="ms-3 text-sm font-normal">WebSocket Closed</div>
+                <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 " data-dismiss-target="#toast-danger" aria-label="Close">
+                    <span class="sr-only">Close</span>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                </button>
+            </div>
+            `;
+
+            const toastContainer = document.createElement('div');
+            toastContainer.className = 'flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 rounded-lg fixed right-0 ms-5 z-50 bottom-0';
+            toastContainer.innerHTML = toastHtml;
+
+            document.body.appendChild(toastContainer);
+
+            setTimeout(() => {
+                toastContainer.remove();
+            }, 5000);
+
+            const closeButton = toastContainer.querySelector('[aria-label="Close"]');
+            closeButton.addEventListener('click', () => {
+                toastContainer.remove();
+            });
+        };
+
+        socket.onerror = function(error) {
+            console.error("WebSocket error: " + error.message);
+            alert('WebSocket error');
+        };
+
+        document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
+        document.getElementById('msg').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        function sendMessage() {
+            const message = document.getElementById('msg').value.trim();
+            if (message) {
+                socket.send(JSON.stringify({
+                    token: getCookie('X-ChatAppAccessToken'),
+                    data: {
+                        to: 2,
+                        message: message,
+                        action: 'message',
+
+                    }
+                }));
+                document.getElementById('msg').value = '';
+            }
         }
 
-        if (messageData.isSelf) {
-            messageElement.className = "text-white bg-blue-500 rounded-lg p-2 mb-2 max-w-max ml-auto text-right";
-        } else {
-            messageElement.className = "text-gray-800 bg-gray-200 rounded-lg p-2 mb-2 max-w-max mr-auto text-left";
-        }
-
-        messageElement.innerHTML = `<strong>${messageData.user_id}:</strong> ${messageData.text}`;
-        messages.appendChild(messageElement);
-        messages.scrollTop = messages.scrollHeight;
-    };
-
-    socket.onclose = function() {
-        console.log("Connection closed");
-    };
-
-    socket.onerror = function(error) {
-        console.log("WebSocket error: " + error.message);
-    };
-
-    document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
-    document.getElementById('msg').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
         }
     });
-
-    function sendMessage() {
-        const message = document.getElementById('msg').value.trim();
-        if (message) {
-            socket.send(JSON.stringify({
-                from: `1`,
-                to: 12,
-                message: message
-            }));
-            document.getElementById('msg').value = '';
-        }
-    }
 </script>
