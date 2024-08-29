@@ -5,7 +5,6 @@ use Swoole\Http\Response;
 function render(Response $res, string $view, array $data = [])
 {
     ob_start();
-
     extract($data);
     if (!file_exists(__DIR__ . "/../../resources/views/$view.php")) {
         $res->status(404);
@@ -18,6 +17,24 @@ function render(Response $res, string $view, array $data = [])
     include __DIR__ . "/../../resources/views/layouts/footer.php";
 
     $content = ob_get_clean();
+    if ($res->isWritable()) {
+        $res->end($content);
+    }
+    else{
 
-    $res->end($content);
+        return;
+    }
+}
+
+function SendJson(Response $response, array $data)
+{
+
+    $response->setHeader("content-type", "application/json");
+    if ($response->isWritable()) {
+        
+        $response->end(json_encode($data));
+    }
+    else{
+        return;
+    }
 }

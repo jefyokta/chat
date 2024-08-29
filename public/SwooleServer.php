@@ -8,6 +8,7 @@ require_once __DIR__ . "/../app/http/Responses.php";
 
 use oktaa\console\Console;
 use oktaa\middlewareSwoole\Auth as Au;
+use oktaa\model\UserModel;
 use oktaa\Swoole\Error\ErrorHandler;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
@@ -28,7 +29,14 @@ $logMiddleware = function (Request $request, Response $response, $next) {
         $errorline = $filelines[$th->getLine() - 1];
         Console::error($th->getMessage());
         // var_dump($th->getCode());
-        render($response, 'error/error', ["code" => $th->getCode(), "message" => $th->getMessage(), "line" => $th->getLine(), "trace" => $th->getTrace(), "file" => $th->getFile(), "errorline" => $errorline]);
+        render($response, 'error/error', [
+            "code" => $th->getCode(),
+            "message" => $th->getMessage(),
+            "line" => $th->getLine(),
+            "trace" => $th->getTrace(),
+            "file" => $th->getFile(),
+            "errorline" => $errorline
+        ]);
     }
 };
 
@@ -46,22 +54,51 @@ $app->get('/', function (Request $request, Response $response) {
     render($response, 'index', ['username' => "jefyokta"]);
 });
 
+
 $app->get("/login", function (Request $request, Response $response) {
     render($response, 'login');
 });
+
 $app->post('/login', function (Request $req, Response $res) {
     Au::Login($req, $res);
 });
-$app->get("/register", function ($req, $res) {
 
+
+$app->get("/register", function ($req, $res) {
     render($res, "register");
 });
+
+
 $app->get("/token", function (Request $req, Response $res) {
     Au::TokenVerify($req, $res, function ($dec) use ($res) {
-        $dec->userid;
-        $res->setHeader("content-type","application/json");
+        $res->setHeader("Content-Type", "Application/json");
         $res->end(json_encode($dec));
     });
+});
+
+
+$app->post("/register", function (Request $req, Response $res) {
+
+    $body = json_decode($req->rawContent(), true);
+
+    if (!isset($body['username'], $body['password'])) {
+        $res->status(400);
+        $res->end();
+    } else {
+
+        $user = UserModel::find($body['username']);
+        if ($user) {
+            $res->status(400);
+            SendJson($res, ApiResponse([], "username has been used"));
+        }
+        $user =  UserModel::insert(["username" => $body['username'], "password" => $body['password']])->run(true);
+        if ($user > 0) {
+            $res->status(200);
+            SendJson($res, ApiResponse(["oke"]));
+        } else {
+            SendJson($res, ApiResponse(["not ok"]));
+        }
+    }
 });
 
 $app->start();

@@ -13,7 +13,6 @@ class Test
 
     public function run()
     {
-
-
+        echo config("appmual");
     }
 }

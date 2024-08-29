@@ -2,6 +2,7 @@
 
 namespace oktaa\middlewareSwoole;
 
+use Cli;
 use oktaa\model\Usermodel;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -37,42 +38,43 @@ class Auth
     public static function TokenVerify(Request $req, Response $res, callable $next)
     {
         $accesstoken = isset($req->cookie[self::$accesstokenName]) ? $req->cookie[self::$accesstokenName] : null;
-        if (!is_null($accesstoken)) {
+        if (is_null($accesstoken)) {
             $res->redirect('/login');
+            return;
         }
 
+        $dec = JWT::decode($accesstoken, new Key(env('ACCESS_KEY'), 'HS512'));
+        if ($dec) {
+            $data = (object) ["username" => $dec->username, "id" => $dec->id];
+            Cli::info("ok");
+            $next($data);
+        } else {
 
-        if ($accesstoken) {
             try {
-                $dec = JWT::decode($accesstoken, new Key(env('ACCESS_KEY'), 'HS512'));
-
-                $data = ["username" => $dec->username, "id" => $dec->id];
-                $next($data);
-            } catch (\Exception $e) {
-
-
-                try {
-                    $jwt = isset($req->cookie[self::$tokenName]) ? $req->cookie[self::$tokenName] : false;
-                    if (!$jwt) {
-                        $res->redirect("/login", 302);
-                    }
-
-                    $dec = JWT::decode("", new Key(env('SERVERKEY'), 'HS512'));
-                    $IsInDb = self::Model()->VerifyToken($dec->username, $jwt);
-                    if ($IsInDb) {
-
-                        $newAccessToken = self::GenerateAccessToken(["id" => $dec->id, "username" => $dec->username]);
-                        $res->cookie(self::$accesstokenName, $newAccessToken, time() + 3600, '/');
-                        $data = (object) ["username" => $dec->username, "id" => $dec->id];
-                        $next($data);
-                    }
-                } catch (\Exception $e) {
-                    echo $e->getMessage();
-                    $res->redirect("/login", 302);
+                $jwt = isset($req->cookie[self::$tokenName]) ? $req->cookie[self::$tokenName] : false;
+                if (!$jwt) {
+                    Cli::error(" no token");
+                    $res->redirect("/login");
                 }
+
+                $dec = JWT::decode($jwt, new Key(env('SERVERKEY'), 'HS512'));
+                if (!$jwt) {
+                    $res->status(401);
+                    # code...
+                }
+                $IsInDb = self::Model()->VerifyToken($dec->username, $jwt);
+                if ($IsInDb) {
+
+                    $newAccessToken = self::GenerateAccessToken(["id" => $dec->id, "username" => $dec->username]);
+                    $res->cookie(self::$accesstokenName, $newAccessToken, time() + 3600, '/');
+                    $data = (object) ["username" => $dec->username, "id" => $dec->id];
+                    $next($data);
+                }
+            } catch (\Exception $e) {
+                echo $e->getMessage();
+                $res->redirect("/login");
             }
         }
-        $res->redirect("/login", 302);
     }
 
     private static function GenerateAccessToken($user): string

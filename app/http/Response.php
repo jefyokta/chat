@@ -93,4 +93,5 @@ class ResponseSwoole extends HttpResponse
         $this->write($content);
         $this->end();
     }
+    
 }
