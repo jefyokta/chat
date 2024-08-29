@@ -1,6 +1,7 @@
 <?php
 
 use oktaa\Seeder\Seeder;
+
 fwrite(STDOUT, "\n");
 
 /**
@@ -79,7 +80,8 @@ $commands = [
     'serve' => 'Start the server',
     'ws' => 'Run WebSocket server',
     'dbseed' => "Seeding Database",
-    'test' => "execute Test::run()"
+    'test' => "execute Test::run()",
+    "start" => "Start Server With Swoole Http Server"
 ];
 
 /**
@@ -137,32 +139,31 @@ switch ($argv[1] ?? null) {
         break;
 
 
-/**
- * 
- * ---------------------------------------
- * Starting Server                        |
- * ---------------------------------------
- * 
- */
+        /**
+         * 
+         * ---------------------------------------
+         * Starting Server                        |
+         * ---------------------------------------
+         * 
+         */
     case 'serve':
         fwrite(STDOUT, "\n");
         CLI::info("Starting server at http://" . config('app.url'));
         fwrite(STDOUT, "\n");
         shell_exec('php -S ' . config('app.url') . ' -t public');
         break;
-    case 'swoole-serve':
-        fwrite(STDOUT, "\n");
-        CLI::info("Starting server at http://" . config('app.url'));
-        fwrite(STDOUT, "\n");
+    case 'start':  
         require_once __DIR__ . "/public/SwooleServer.php";
         break;
-/**
- * 
- * ---------------------------------------
- * Starting Websocker Server              |
- * ---------------------------------------
- * 
- */
+  
+        /**
+         * 
+         * ---------------------------------------
+         * Starting Websocker Server              |
+         * ---------------------------------------
+         * 
+         */
+
     case 'ws':
         $extensions = get_loaded_extensions();
 
@@ -176,27 +177,27 @@ switch ($argv[1] ?? null) {
         fwrite(STDOUT, "\n");
         require_once __DIR__ . "/app/websocket/index.php";
         break;
-/**
- * 
- * ---------------------------------------
- * Running Database Migration             |
- * ---------------------------------------
- * 
- */
+        /**
+         * 
+         * ---------------------------------------
+         * Running Database Migration             |
+         * ---------------------------------------
+         * 
+         */
     case 'migrate':
         fwrite(STDOUT, "Running migrations...\n\n");
         require_once __DIR__ . "/console/migration.php";
         break;
 
 
-/**
- * 
- * -------------------------------------------------------------
- * Execute Test::run()                                          |
- * You Can Write any PHP Script in this method and Run them     |
- * -------------------------------------------------------------
- * 
- */
+        /**
+         * 
+         * -------------------------------------------------------------
+         * Execute Test::run()                                          |
+         * You Can Write any PHP Script in this method and Run them     |
+         * -------------------------------------------------------------
+         * 
+         */
     case 'test':
         require_once __DIR__ . "/app/test/Test.php";
         $test = new Test();
@@ -208,13 +209,13 @@ switch ($argv[1] ?? null) {
         }
         fwrite(STDOUT, "\n");
         break;
-/**
- * 
- * ---------------------------------------
- * Command List                           |
- * ---------------------------------------
- * 
- */
+        /**
+         * 
+         * ---------------------------------------
+         * Command List                           |
+         * ---------------------------------------
+         * 
+         */
     case '-l':
     case '-list':
     case '--list':
@@ -223,28 +224,28 @@ switch ($argv[1] ?? null) {
         fwrite(STDOUT, "\n");
         break;
 
-/**
- * 
- * ---------------------------------------
- * Make File                              |
- * ---------------------------------------                       
- * -Model                                 |
- * -Seeder                                |
- * -App                                   |
- * ---------------------------------------
- * 
- */
+        /**
+         * 
+         * ---------------------------------------
+         * Make File                              |
+         * ---------------------------------------                       
+         * -Model                                 |
+         * -Seeder                                |
+         * -App                                   |
+         * ---------------------------------------
+         * 
+         */
     case 'make':
         handleMakeCommand($argv);
         break;
-/**
- * 
- * ---------------------------------------
- * Run Seeder::run()                      |
- * Seeding Database                       |
- * ---------------------------------------
- * 
- */
+        /**
+         * 
+         * ---------------------------------------
+         * Run Seeder::run()                      |
+         * Seeding Database                       |
+         * ---------------------------------------
+         * 
+         */
     case 'dbseed':
         $seeder = new Seeder();
         fwrite(STDOUT, "\n");

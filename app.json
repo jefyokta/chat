@@ -9,7 +9,8 @@
         "serve": "Start the server",
         "ws": "Run WebSocket server",
         "dbseed": "Seeding Database",
-        "test": "execute Test::run()"
+        "test": "execute Test::run()",
+        "start":"Start Server With Swoole"
     },
     "custom_commands":{
         "my-start-serve":"php okta serve"

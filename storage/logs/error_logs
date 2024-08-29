@@ -1,0 +1,7 @@
+Unsupported operand types: string + int
+ Unsupported operand types: string + int
+ Unsupported operand types: string + int
+ Unsupported operand types: string + int
+ Unsupported operand types: string + int
+[29/08/2024 09:51] 127.0.0.1:  GET /login1 Unsupported operand types: string + int
+[29/08/2024 09:52] 127.0.0.1:  GET /login1 Unsupported operand types: string + int

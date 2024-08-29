@@ -10,6 +10,7 @@ use oktaa\model\UserModel;
 
 use oktaa\App\App;
 use oktaa\App\ApiApp;
+use oktaa\App\AuthApp;
 use oktaa\App\UserApp;
 
 $app = new App();
@@ -22,12 +23,13 @@ $app->get('/', function (Request $req, Response $res) {
 
 $app->path('/kon', UserApp::class);
 $app->path('/api', ApiApp::class);
+$app->path("/auth", AuthApp::class);
 
 
 
 $app->get('/login', fn(Request $req, Response $res) => $res->render('login'));
 $app->post('/login', function (Request $req, Response $res) {
-    $islogin =  Auth::Login($req, $res);
+    Auth::Login($req, $res);
 
     // $res->Json([$req]);
 

@@ -4,8 +4,11 @@ namespace oktaa\App;
 
 use InvalidArgumentException;
 use oktaa\http\Request\Request;
+use oktaa\http\Request\RequestSwoole;
+use Swoole\Http\Request as SwooleRequest;
+use Swoole\Http\Response as SwooleResponse;
 use oktaa\http\Response\Response;
-
+use oktaa\http\Response\ResponseSwoole;
 
 class App
 {
@@ -75,12 +78,12 @@ class App
         return $this;
     }
 
-    private function request(): Request
+    protected function request(): Request
     {
         return new Request();
     }
 
-    private function response(): Response
+    protected function response(): Response
     {
         return new Response();
     }
@@ -128,4 +131,103 @@ class App
             exit;
         }
     }
+}
+
+
+class AppSwoole
+{
+    private $routes = [
+        'GET' => [],
+        'POST' => [],
+        'PUT' => [],
+        'DELETE' => []
+    ];
+
+    private $subApps = [];
+
+    public function get($path, callable|array|App $callback)
+    {
+        $this->routes['GET'][$path] = $callback;
+        return $this;
+    }
+
+    public function post($path, callable|array|App $callback)
+    {
+        $this->routes['POST'][$path] = $callback;
+        return $this;
+    }
+
+    public function put($path, callable|array|App $callback)
+    {
+        $this->routes['PUT'][$path] = $callback;
+        return $this;
+    }
+
+    public function delete($path, callable|array|App $callback)
+    {
+        $this->routes['DELETE'][$path] = $callback;
+        return $this;
+    }
+
+    public function path($prefix, $subApp)
+    {
+        if (is_string($subApp) && class_exists($subApp)) {
+            $subApp = new $subApp();
+        }
+        if (!$subApp instanceof App) {
+            throw new InvalidArgumentException("The sub-application must be an instance of App or a valid class name.");
+        }
+        $this->subApps[$prefix] = $subApp;
+        return $this;
+    }
+
+    private function matchRoute($requestUri, $method)
+    {
+        foreach ($this->routes[$method] as $path => $callback) {
+            $pattern = preg_replace('/\{[^\}]+\}/', '([^/]+)', $path);
+            if (preg_match('#^' . $pattern . '$#', $requestUri, $matches)) {
+                array_shift($matches);
+                return [$callback, $matches];
+            }
+        }
+        return [null, []];
+    }
+
+    public function run(SwooleRequest $request, SwooleResponse $response)
+    {
+        $requestMethod = $request->server['request_method'] ?? 'GET';
+        $requestUri = $request->server['path_info'] ?? '/';
+
+        foreach ($this->subApps as $prefix => $subApp) {
+            if (strpos($requestUri, $prefix) === 0) {
+                $subRequestUri = substr($requestUri, strlen($prefix));
+                $subApp->run($request, $response);
+                return;
+            }
+        }
+
+        list($callback, $params) = $this->matchRoute($requestUri, $requestMethod);
+        if ($callback) {
+            if (is_callable($callback)) {
+                call_user_func_array($callback, array_merge([$request, $response], $params));
+            } elseif (is_array($callback)) {
+                foreach ($callback as $func) {
+                    if (is_callable($func)) {
+                        call_user_func_array($func, array_merge([$request, $response], $params));
+                    }
+                }
+            } else {
+                $this->sendErrorResponse($response, 500, 'Internal Server Error');
+            }
+        } else {
+            $this->sendErrorResponse($response, 404, '404 Not Found');
+        }
+    }
+
+    private function sendErrorResponse(SwooleResponse $response, $statusCode, $message)
+    {
+        $response->status($statusCode);
+        $response->end($message);
+    }
+   
 }

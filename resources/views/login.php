@@ -11,21 +11,33 @@
     <div class="flex items-center h-5">
 
     </div>
-    <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit</button>
+    <button type="button" onclick="Login()" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit</button>
 </form>
 <script>
   const Login = async () => {
-    const username = document.getElementById('username');
-    const password =  document.getElementById('password');
+
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
     const result = await fetch(`/login`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
-        username,
-        password
+        username: username,
+        password: password
       })
-    })
-    if(result.ok){
-      location.href = '/'
+    });
+
+    // const data = await result.json();
+    console.log(result)
+
+    if (result.ok) {
+      location.href = result.url
+    } else {
+      console.error('Error:', data);
     }
+
   }
 </script>

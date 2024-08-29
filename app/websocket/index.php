@@ -8,6 +8,8 @@ use Swoole\WebSocket\Frame;
 use oktaa\model\MessageModel;
 use oktaa\model\UserModel;
 use oktaa\Websocket\Routing;
+use Swoole\Coroutine;
+use Swoole\Timer;
 
 $route = new Routing();
 $route->path('message', function (Server $server, Frame $frame, array $data) {
@@ -23,15 +25,15 @@ $route->path('message', function (Server $server, Frame $frame, array $data) {
                 'message' => $message
             ])->run();
         } catch (\Exception $e) {
-            $server->push($frame->fd, json_encode(WebsocketResponse([],'error','internal server error')));
+            $server->push($frame->fd, json_encode(WebsocketResponse([], 'error', 'internal server error')));
         }
     } else {
-        $server->push($frame->fd, json_encode([
-            'type' => 'error',
-            'error' => 'Invalid message data',
-            'data' => []
-        ]));
+        $server->push($frame->fd, json_encode(WebsocketResponse([], 'error', 'invalid message data')));
     }
+});
+$route->path('mymessage', function (Server $server, Frame $frame, array $data) {
+    $id = $data['id'];
+    UserModel::getMyMessage($id);
 });
 
 $server = new Server(config('ws.host'), config('ws.port'));
@@ -46,6 +48,9 @@ $server->on('open', function (Server $server, Request $request) {
 
 $server->on('message', function (Server $server, Frame $frame) use ($route) {
     $messageData = json_decode($frame->data, true);
+    var_dump($frame->data);
+    var_dump($server->getClientInfo($frame->fd));
+
 
     if ($messageData === null && json_last_error() !== JSON_ERROR_NONE) {
         $server->push($frame->fd, json_encode(['error' => 'Invalid JSON format', 'data' => []]));
@@ -53,7 +58,7 @@ $server->on('message', function (Server $server, Frame $frame) use ($route) {
     }
 
     if (isset($messageData['token'])) {
-        $userid = Auth::TokenVerify($messageData['token']);
+        $userid = Auth::decodeToken($messageData['token']);
         if (is_array($userid)) {
             $data = $messageData['data'] ?? [];
             $data['from'] = $userid['id'];
@@ -70,7 +75,7 @@ $server->on('message', function (Server $server, Frame $frame) use ($route) {
         }
     } else {
         echo 'No credential';
-        $server->push($frame->fd, json_encode(WebsocketResponse([],'error','invalid credential')));
+        $server->push($frame->fd, json_encode(WebsocketResponse([], 'error', 'invalid credential')));
     }
 });
 

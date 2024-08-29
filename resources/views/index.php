@@ -25,70 +25,7 @@
                     </li>
                 <?php endfor; ?>
 
-                <li class="py-3 sm:py-4">
-                    <div class="flex items-center space-x-4 rtl:space-x-reverse">
-                        <div class="flex-shrink-0">
-                            <img class="w-8 h-8 rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-3.jpg" alt="Neil image">
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                Bonnie Green
-                            </p>
-                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                email@flowbite.com
-                            </p>
-                        </div>
 
-                    </div>
-                </li>
-                <li class="py-3 sm:py-4">
-                    <div class="flex items-center space-x-4 rtl:space-x-reverse">
-                        <div class="flex-shrink-0">
-                            <img class="w-8 h-8 rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-2.jpg" alt="Neil image">
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                Michael Gough
-                            </p>
-                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                email@flowbite.com
-                            </p>
-                        </div>
-
-                    </div>
-                </li>
-                <li class="py-3 sm:py-4">
-                    <div class="flex items-center space-x-4 rtl:space-x-reverse">
-                        <div class="flex-shrink-0">
-                            <img class="w-8 h-8 rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="Neil image">
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                Thomas Lean
-                            </p>
-                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                email@flowbite.com
-                            </p>
-                        </div>
-
-                    </div>
-                </li>
-                <li class="pt-3 pb-0 sm:pt-4">
-                    <div class="flex items-center space-x-4 rtl:space-x-reverse">
-                        <div class="flex-shrink-0">
-                            <img class="w-8 h-8 rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-4.jpg" alt="Neil image">
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                Lana Byrd
-                            </p>
-                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                email@flowbite.com
-                            </p>
-                        </div>
-
-                    </div>
-                </li>
             </ul>
 
         </div>
@@ -203,6 +140,7 @@
         function sendMessage() {
             const message = document.getElementById('msg').value.trim();
             if (message) {
+                GetToken();
                 socket.send(JSON.stringify({
                     token: getCookie('X-ChatAppAccessToken'),
                     data: {
@@ -221,5 +159,11 @@
             const parts = value.split(`; ${name}=`);
             if (parts.length === 2) return parts.pop().split(';').shift();
         }
+
     });
+    async function GetToken() {
+        const res = await fetch('/auth/token')
+        console.log(await res.json());
+
+    }
 </script>

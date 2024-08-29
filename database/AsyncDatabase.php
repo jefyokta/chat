@@ -34,14 +34,39 @@ abstract class Database
         $this->password = config('db.password');
         $this->port = config('db.port');
 
-        Coroutine::create(function () {
-            try {
-                $this->dbh = new PDO(config('db.connection') . ":host=$this->host;port=$this->port;dbname=$this->db", $this->user, $this->password);
-                $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            } catch (PDOException $e) {
-                throw $e;
-            }
-        });
+        // Coroutine::create(function () {
+        // try {
+        //     $this->dbh = new PDO(config('db.connection') . ":host=$this->host;port=$this->port;dbname=$this->db", $this->user, $this->password);
+        //     $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        // } catch (PDOException $e) {
+        //     throw $e;
+        // }
+        // });
+        $this->connect();
+    }
+    private function connect()
+    {
+
+        // $this->dbh = new MySQL();
+        // $this->dbh->connect([
+        //     "host" => $this->host,
+        //     "port" => $this->port,
+        //     "user" => $this->user,
+        //     "password" => $this->password,
+        //     "database" => $this->db
+        // ]);
+        try {
+            $this->dbh = new PDO(
+                config('db.connection') . ":host=$this->host;port=$this->port;dbname=$this->db",
+                $this->user,
+                $this->password
+            );
+            $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            // Log error atau tampilkan pesan error
+            echo "Connection failed: " . $e->getMessage() . "\n";
+            exit;
+        }
     }
 
     public static function find($value): array
@@ -122,7 +147,7 @@ abstract class Database
 
         Coroutine::create(function () use ($channel) {
             try {
-                Coroutine::wait(1);
+                // $this->connect();
                 $stmt =  $this->dbh->prepare($this->sql);
                 $stmt->execute($this->params);
                 $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -138,7 +163,9 @@ abstract class Database
     public function first()
     {
         return Coroutine::create(function () {
-            $stmt = $this->dbh->prepare($this->sql);
+            $this->connect();
+            Coroutine::wait(1);
+            $stmt =  $this->dbh->prepare($this->sql);
             $stmt->execute($this->params);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             return $result ?? [];
@@ -210,12 +237,7 @@ abstract class Database
         return $ins->table;
     }
 
-    public function raw(string $sql, ?array $params = [])
-    {
-        $this->sql = $sql;
-        $this->params[] = $params;
-        return $this;
-    }
+
 
     public function run(bool $getaffectedrows = false)
     {

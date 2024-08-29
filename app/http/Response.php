@@ -2,6 +2,7 @@
 
 namespace oktaa\http\Response;
 
+use Swoole\Http\Response as HttpResponse;
 
 class Response
 {
@@ -67,7 +68,29 @@ class Response
     public function redirectSameHost(?string $location): void
     {
         header('X-Powered-By: Oktaax');
-        header("Location: " . config('app.host') . "$location");
+        header("Location: http://" . config('app.host') . "$location");
         exit;
+    }
+}
+
+class ResponseSwoole extends HttpResponse
+{
+    public function render(string $views, array $data = [])
+    {
+        ob_start();
+
+        if (!empty($data)) {
+            extract($data, EXTR_SKIP);
+        }
+
+        require_once __DIR__ . "/../../resources/views/layouts/header.php";
+        require_once __DIR__ . "/../../resources/views/$views.php";
+        require_once __DIR__ . "/../../resources/views/layouts/footer.php";
+
+        $content = ob_get_clean();
+
+        $this->header('Content-Type', 'text/html');
+        $this->write($content);
+        $this->end();
     }
 }

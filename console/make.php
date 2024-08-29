@@ -1,5 +1,7 @@
 <?php
- 
+
+use Swoole\Coroutine;
+
 function createModelFile($filename)
 {
     $namespace = $filename . 'Model';
@@ -7,8 +9,9 @@ function createModelFile($filename)
     $table = strtolower($filename);
 
     $fileContent = "<?php\n\nnamespace oktaa\\model;\n\nuse oktaa\\Database\\$databaseClass as Database;\n\nclass $filename extends $databaseClass\n{\n    protected string \$table = '{$table}';\n    public \$name = '{$table}';\n    protected array \$definition = [\n        'id' => 'INT AUTO_INCREMENT PRIMARY KEY'\n        // Define other columns here\n    ];\n    protected array \$fillable = [\n        // Define your fillable columns here\n    ];\n}\n";
-
-    file_put_contents(__DIR__ . "/../app/models/$namespace.php", $fileContent);
+    Coroutine::run(function () use ($namespace, $fileContent) {
+        Coroutine::writeFile(__DIR__ .  "/../app/models/$namespace.php", $fileContent);
+    });
     Cli::success("Model file created successfully: $namespace.php");
 }
 
@@ -17,17 +20,21 @@ function createAppFile($filename)
 {
     $namespace = $filename . 'App';
     $fileContent = "<?php\n\nnamespace oktaa\\App;\n\nuse oktaa\\App\\App;\n use oktaa\\http\\Request\\Request;\nuse oktaa\\http\\Response\\Response;\n  \n\nclass $filename" . 'App' . " extends App\n{\n    public function __construct()\n    {\n        \$this->get(\"/\", function (Request \$req, Response \$res) {\n            \$res->Json([\"hello\"]);\n      });\n  /*...another routes */ \n    }\n}\n";
-    file_put_contents(__DIR__ . "/../app/app/apps/$namespace.php", $fileContent);
+    Coroutine::run(function () use ($namespace, $fileContent) {
+        Coroutine::writeFile(__DIR__ . "/../app/app/apps/$namespace.php", $fileContent);
+    });
+
     Cli::success("App file created successfully: $namespace.php");
 }
 
-function createSeederFile($filename){
+function createSeederFile($filename)
+{
     $namespace = $filename . 'Seeder';
     $fileContent = "<?php\n\nnamespace oktaa\\Seeder;\n\nclass {$filename}Seeder\n{\n    public function __construct()\n    {\n        // seed here\n    }\n\n    public function model()\n    {\n        // return new Model()\n    }\n}\n";
-
-    file_put_contents(__DIR__ . "/../database/seeder/$namespace.php", $fileContent);
+    Coroutine::run(function () use ($namespace, $fileContent) {
+        Coroutine::writeFile(__DIR__ . "/../database/seeder/$namespace.php", $fileContent);
+    });
     Cli::success("Seeder file created successfully: $namespace.php");
-
 }
 
 function getValidInput($prompt)
@@ -107,7 +114,7 @@ function handleMakeCommand($argv)
         } elseif ($fileType === 'app') {
             $filename = $filename ?: getValidInput("App Name? \n");
             createAppFile($filename);
-        }elseif ($fileType === 'seeder') {
+        } elseif ($fileType === 'seeder') {
             $filename = $filename ?: getValidInput("Seeder Name? \n");
             createSeederFile($filename);
         } else {

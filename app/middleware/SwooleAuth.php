@@ -1,9 +1,12 @@
 <?php
+
+namespace oktaa\middlewareSwoole;
+
 use oktaa\model\Usermodel;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use oktaa\http\Request\Request;
-use oktaa\http\Response\Response;
+use Swoole\Http\Request;
+use Swoole\Http\Response;
 
 class Auth
 {
@@ -33,7 +36,7 @@ class Auth
 
     public static function TokenVerify(Request $req, Response $res, callable $next)
     {
-        $accesstoken = isset($_COOKIE[self::$accesstokenName]) ? $_COOKIE[self::$accesstokenName] : null;
+        $accesstoken = isset($req->cookie[self::$accesstokenName]) ? $req->cookie[self::$accesstokenName] : null;
         if (!is_null($accesstoken)) {
             $res->redirect('/login');
         }
@@ -49,9 +52,9 @@ class Auth
 
 
                 try {
-                    $jwt = isset($req->cookies[self::$tokenName]) ? $req->cookies[self::$tokenName] : false;
+                    $jwt = isset($req->cookie[self::$tokenName]) ? $req->cookie[self::$tokenName] : false;
                     if (!$jwt) {
-                        $res->redirect("/");
+                        $res->redirect("/login", 302);
                     }
 
                     $dec = JWT::decode("", new Key(env('SERVERKEY'), 'HS512'));
@@ -59,19 +62,17 @@ class Auth
                     if ($IsInDb) {
 
                         $newAccessToken = self::GenerateAccessToken(["id" => $dec->id, "username" => $dec->username]);
-                        setcookie(self::$accesstokenName, $newAccessToken, [
-                            "expires" => time() + 3600,
-                            "path" => "/",
-                        ]);
-                        $data = ["username" => $dec->username];
+                        $res->cookie(self::$accesstokenName, $newAccessToken, time() + 3600, '/');
+                        $data = (object) ["username" => $dec->username, "id" => $dec->id];
+                        $next($data);
                     }
                 } catch (\Exception $e) {
                     echo $e->getMessage();
-                    $res->redirect("/login");
+                    $res->redirect("/login", 302);
                 }
             }
         }
-        $res->redirect("/login");
+        $res->redirect("/login", 302);
     }
 
     private static function GenerateAccessToken($user): string
@@ -85,27 +86,27 @@ class Auth
         ];
         return JWT::encode($payload, env('ACCESS_KEY'), 'HS512');
     }
-
     public static function Login(Request $req, Response $res)
     {
         try {
             $tokenexp = time() + 3600 * 24 * 3;
             $accesstokenxp = time() + 3600;
 
-            $r = $req->body;
+            $r = json_decode($req->rawContent(), true);
 
-            // $res->Json(ApiResponse([$r['username']], null))->status();
-
-            $user =  UserModel::select("*")->where("username", '=', $r['username'])->first();
+            // Validasi pengguna
+            $user = UserModel::select("*")->where("username", '=', $r['username'])->first();
 
             if (isset($user->scalar) && !$user->scalar) {
-                $res->Json([ApiResponse([], 'unautorized')])->status(401);
+                $res->header('content-type', 'application/json');
+                $res->end(json_encode(['error' => 'Unauthorized']));
+                return;
             }
 
-
-
             if ($user->password !== $r['password']) {
-                $res->Json(ApiResponse([], 'poiohiuhiuhui'))->status(401);
+                $res->header('content-type', 'application/json');
+                $res->end(json_encode(['error' => 'Invalid credentials']));
+                return;
             }
 
             $payload = [
@@ -116,28 +117,28 @@ class Auth
             ];
 
             $token = JWT::encode($payload, env('SERVERKEY'), 'HS512');
-            self::Model()->UpdateToken($token, $req->body['username']);
+            self::Model()->UpdateToken($token, $r['username']);
             $accesstoken = self::GenerateAccessToken($user);
 
-            setcookie(self::$tokenName, $token, [
-                "expires" => $tokenexp,
-                "httponly" => true,
-                "path" => "/",
-            ]);
+            $res->cookie(self::$tokenName, $token, $tokenexp, '/', '', false, true);
+            $res->cookie(self::$accesstokenName, $accesstoken, $accesstokenxp, '/', '', false, false);
 
-            setcookie(self::$accesstokenName, $accesstoken, [
-                "expires" => $accesstokenxp,
-                "path" => "/",
-            ]);
-            $res->redirectSameHost('/');
+            $res->redirect('/');
         } catch (\Throwable $th) {
-            $res->Json(ApiResponse([], $th->getMessage().PHP_EOL.$th->getFile().$th->getLine()));
+            $res->header('content-type', 'application/json');
+            $res->end(json_encode([
+                'error' => $th->getMessage() . PHP_EOL . $th->getFile() . $th->getLine()
+            ]));
         }
     }
+
+
 
     public static function LogOut(Request $req, Response $res)
     {
         self::TokenVerify($req, $res, function ($data) {
+
+
             setcookie(self::$tokenName, '', [
                 "expires" => time() - 3600,
                 "httponly" => true,

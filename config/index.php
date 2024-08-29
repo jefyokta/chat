@@ -1,6 +1,7 @@
 <?php
 
 use Dotenv\Dotenv;
+use Swoole\Http\Response;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . "/../");
 $dotenv->load();
@@ -20,7 +21,7 @@ function config(string $key)
             "dbname" => "chat",
             "dbuser" => "root",
             "dbpass" => "root",
-            "url" => env('APP_URL', 'localhost:8000'),
+            "url" => env('APP_URL', 'http://localhost:8000'),
             "name" => env('APP_NAME', 'OktaApp'),
             "timezone" => env("APP_TIMEZONE", "Asia/Jakarta"),
             "host" => env('APP_URL', 'localhost:8000'),
@@ -65,3 +66,7 @@ function ResourcePath(string $res): string
 {
     return __DIR__ . '/../resources/' . $res;
 }
+
+date_default_timezone_set(config("app.timezone"));
+
+

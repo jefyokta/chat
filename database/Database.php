@@ -2,6 +2,11 @@
 
 namespace oktaa\Database;
 
+use Swoole\Runtime;
+
+// Runtime::enableCoroutine(true, SWOOLE_HOOK_ALL);
+
+
 use PDO;
 use PDOException;
 use InvalidArgumentException;
@@ -107,9 +112,10 @@ abstract class Database
         $this->params[] = $value;
         return $this;
     }
-    public function get(): array
+    public function get(): ?array
     {
         try {
+
             $stmt = $this->dbh->prepare($this->sql);
             $stmt->execute($this->params);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -119,10 +125,15 @@ abstract class Database
     }
     public function first()
     {
-        $stmt = $this->dbh->prepare($this->sql);
-        $stmt->execute($this->params);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result ?? [];
+        try {
+            $stmt = $this->dbh->prepare($this->sql);
+            $stmt->execute($this->params);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return (object) $result;
+        } catch (\Throwable $th) {
+            echo $th->getMessage();
+            throw $th;
+        }
     }
 
     public function execute(): void
@@ -131,6 +142,7 @@ abstract class Database
             $stmt = $this->dbh->prepare($this->sql);
             $stmt->execute($this->params);
         } catch (\Throwable $th) {
+
             throw $th;
         }
     }
@@ -224,12 +236,7 @@ abstract class Database
         $ins = new static();
         return $ins->table;
     }
-    public function raw(string $sql, ?array $params = [])
-    {
-        $this->sql = $sql;
-        $this->params[] = $params;
-        return $this;
-    }
+
 
     public function run(bool $getaffectedrows = false)
     {
@@ -261,11 +268,15 @@ abstract class Database
     }
     public function getSql(): ?string
     {
-        return $this->sql;
+        return $this->sql ?? null;
     }
     public function OrderBy($column, OrderByType $type): Database
     {
         $this->sql .= " ORDER BY $column " . $type->value;
         return $this;
+    }
+    public function getParams()
+    {
+        return $this->params;
     }
 }
