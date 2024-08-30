@@ -38,6 +38,11 @@ php okta generate-keys
 ```
  php okta migrate
 ```
+- Run Seeder (optional)
+
+```
+ php okta dbseed
+```
 
 - Start Http server And Websocket Server
 
@@ -49,4 +54,4 @@ php okta start
 php okta ws
 ```
 
-### done !
+## done !
