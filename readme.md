@@ -1,0 +1,49 @@
+# ChatApp
+
+## requirement
+
+- php 8.2+
+- openswoole (php extension)
+
+```
+pecl install openswoole
+```
+
+## start
+
+- Clone Project
+
+```
+git clone https://github.com/jefyokta/chat.git
+```
+
+- Install php package
+
+```
+composer install
+```
+
+- Creating app keys
+
+```
+php okta generate-keys
+```
+
+
+- Run Migration
+
+```
+ php okta migrate
+```
+
+- Start Http server And Websocket Server
+
+```
+php okta start
+```
+
+```
+php okta ws
+```
+
+### done !

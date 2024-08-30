@@ -25,7 +25,7 @@ require_once __DIR__ . "/console/Style.php";
  * 
  * 
  */
-
+$argv[1] = $argv[1]?? null;
 if ($argv[1] === 'generate-keys') {
     require_once __DIR__ . "/console/GenerateKeys.php";
     Coroutine::run(
