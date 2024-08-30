@@ -9,7 +9,7 @@ class MessageModel extends Database
 {
     protected string $table = 'messages';
     protected array $definition = [
-        "id" => "INT PRIMARY KEY AUTO_INCREMENT",
+        "id" => "VARCHAR(255) PRIMARY KEY",
         "message" => "TEXT",
         "`from`" => "INT NULL",
         "`to`" => "INT NULL",

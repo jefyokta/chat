@@ -3,6 +3,7 @@
 namespace oktaa\model;
 
 use oktaa\Database\Database as Database;
+use oktaa\Database\Interfaces\OrderByType;
 
 class UserModel extends Database
 {
@@ -22,20 +23,37 @@ class UserModel extends Database
     ];
     public static function getMyMessage($userid)
     {
-        $users = self::selectDistinct('users.*')
-            ->join('messages', 'users.id = messages.from OR users.id = messages.to')
-            ->where('messages.from', '=', $userid)
-            ->orWhere('messages.to', '=', $userid)
-            ->andWhere('users.username', '!=', $userid)
-            ->get();
 
-        if (!is_array([$users])) {
-            return [];
-        }
-        $filteredUsers = array_filter($users, function ($user) use ($userid) {
-            return $user['id'] !== $userid;
-        });
-        return $filteredUsers ? $filteredUsers : [];
+        $users =  UserModel::raw(
+            "SELECT users.id, users.username, MAX(messages.created_at) AS created_at
+        FROM users
+        LEFT JOIN messages ON (users.id = messages.from OR users.id = messages.to)
+            AND (messages.from = ? OR messages.to = ?)
+        WHERE users.id != ?
+        GROUP BY users.id, users.username
+        ORDER BY created_at DESC",
+        [
+            $userid,
+            $userid,
+            $userid
+        ]
+        )->get();
+
+        return $users ?: [];
+        // $users = self::selectDistinct('users.*')
+        //     ->join('messages', 'users.id = messages.from OR users.id = messages.to')
+        //     ->where('messages.from', '=', $userid)
+        //     ->orWhere('messages.to', '=', $userid)
+        //     ->andWhere('users.username', '!=', $userid)
+        //     ->get();
+
+        // if (!is_array([$users])) {
+        //     return [];
+        // }
+        // $filteredUsers = array_filter($users, function ($user) use ($userid) {
+        //     return $user['id'] !== $userid;
+        // });
+        // return $filteredUsers ? $filteredUsers : [];
     }
 
     public  function UpdateToken(string $token, string $username): void
@@ -59,6 +77,4 @@ class UserModel extends Database
 
         return true;
     }
-
-
 }

@@ -43,7 +43,20 @@ abstract class Database
             throw $e;
         }
     }
-    public static function find($value): array
+
+    public static function raw($sql, array $params = [])
+    {
+        $i = new static();
+        $i->sql = $sql;
+        $i->params = $params;
+        return $i;
+    }
+    public static function getPdo()
+    {
+        $static = new static();
+        return $static->dbh;
+    }
+    public static function find($value): object|false
     {
 
         $static = new static();
@@ -52,7 +65,7 @@ abstract class Database
         $static->params[] = $value;
         $stat->execute($static->params);
         $result = $stat->fetch(PDO::FETCH_ASSOC);
-        return $result ? $result : [];
+        return $result ? (object)$result : false;
     }
     public static function search($value)
     {
@@ -123,13 +136,13 @@ abstract class Database
             throw $th;
         }
     }
-    public function first()
+    public function first(): object|false
     {
         try {
             $stmt = $this->dbh->prepare($this->sql);
             $stmt->execute($this->params);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            return (object) $result;
+            return $result ? (object)$result : false;
         } catch (\Throwable $th) {
             echo $th->getMessage();
             throw $th;

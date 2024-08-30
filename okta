@@ -1,6 +1,7 @@
 <?php
 
 use oktaa\Seeder\Seeder;
+use Swoole\Coroutine;
 
 fwrite(STDOUT, "\n");
 
@@ -27,7 +28,11 @@ require_once __DIR__ . "/console/Style.php";
 
 if ($argv[1] === 'generate-keys') {
     require_once __DIR__ . "/console/GenerateKeys.php";
-    new GenerateKeys();
+    Coroutine::run(
+        fn() =>
+        new GenerateKeys()
+    );
+    exit;
     // break;
 }
 
@@ -81,7 +86,8 @@ $commands = [
     'ws' => 'Run WebSocket server',
     'dbseed' => "Seeding Database",
     'test' => "execute Test::run()",
-    "start" => "Start Server With Swoole Http Server"
+    "start" => "Start Server With Swoole Http Server",
+    "generate-keys"=>"Generate SERVERKEY/ACCESSKEY"
 ];
 
 /**
@@ -152,10 +158,10 @@ switch ($argv[1] ?? null) {
         fwrite(STDOUT, "\n");
         shell_exec('php -S ' . config('app.url') . ' -t public');
         break;
-    case 'start':  
+    case 'start':
         require_once __DIR__ . "/public/SwooleServer.php";
         break;
-  
+
         /**
          * 
          * ---------------------------------------

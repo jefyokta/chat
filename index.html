@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/api/js?n=app.js"></script>
+    <link rel="stylesheet" href="/api/css?n=app.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.css" rel="stylesheet" />
+
+</head>
+
+<body class="bg-gray-100 overflow-hidden"><div class="flex w-full h-full">
+    <div id="people" class="w-1/4 rounded-md fixed h-screen p-2">
+        <div class="relative bg-gradient-to-b from-slate-950/90 to-blue-950/90 backdrop-blur-lg border border-gray-300 border-opacity-30 overflow-y-scroll h-full rounded-md shadow-lg">
+            <div class="p-5">
+                <h1 class="text-slate-100 text-3xl">jefyokta</h1>
+            </div>
+
+            <ul class="max-w-md divide-y p-5 divide-gray-200 overflow-y-scroll relative">
+                                    <a href="/messages?with=3" class="pb-3 sm:pb-4" id="user3">
+                        <div class="flex items-center space-x-4 p-2 px-4 hover:bg-slate-100/10 rounded-md">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-200 truncate">jepi</p>
+                                <p class="text-sm text-gray-500 truncate">email@flowbite.com</p>
+                            </div>
+                        </div>
+                    </a>
+                                    <a href="/messages?with=2" class="pb-3 sm:pb-4" id="user2">
+                        <div class="flex items-center space-x-4 p-2 px-4 hover:bg-slate-100/10 rounded-md">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-200 truncate">jefyokta2</p>
+                                <p class="text-sm text-gray-500 truncate">email@flowbite.com</p>
+                            </div>
+                        </div>
+                    </a>
+                                <a href="/messages?with=" class="pb-3 sm:pb-4" id="user">
+                    <div class="flex items-center space-x-4 p-2 hover:bg-slate-100/10 rounded-md">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-200 truncate"> ini test aja</p>
+                            <p class="text-sm text-gray-500 truncate">email@flowbite.com</p>
+                        </div>
+                    </div>
+                </a>
+            </ul>
+        </div>
+    </div>
+
+            <div class="w-3/4 right-0 absolute h-screen overflow-scroll">
+            <div class="bg-slate-900 rounded-md mt-1 sticky top-0 flex items-center mb-2 p-4">
+                <h1 class="text-slate-300">jefyokta2</h1>
+            </div>
+            <div id="messages" class="bg-white border rounded p-4 py-24 overflow-y-auto" style=" height: calc(100vh - 80px); ">
+                                                            <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">hi</p>
+                                <span class="text-xs text-gray-500">2024-08-29 19:47:54</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">hi</p>
+                                <span class="text-xs text-gray-500">2024-08-29 19:52:08</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">heii</p>
+                                <span class="text-xs text-gray-500">2024-08-29 19:53:14</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">asdasdas</p>
+                                <span class="text-xs text-gray-200">2024-08-29 19:54:17</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">eqwewqe</p>
+                                <span class="text-xs text-gray-200">2024-08-29 19:57:43</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">heii</p>
+                                <span class="text-xs text-gray-500">2024-08-29 20:07:45</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">rwqrqr</p>
+                                <span class="text-xs text-gray-200">2024-08-29 20:15:14</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">dsajnsad</p>
+                                <span class="text-xs text-gray-200">2024-08-29 20:17:27</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">erraera</p>
+                                <span class="text-xs text-gray-200">2024-08-29 20:37:54</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">heii</p>
+                                <span class="text-xs text-gray-200">2024-08-29 20:44:37</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">ras</p>
+                                <span class="text-xs text-gray-200">2024-08-29 20:45:30</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">asdsa</p>
+                                <span class="text-xs text-gray-200">2024-08-29 21:00:00</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">231</p>
+                                <span class="text-xs text-gray-200">2024-08-29 21:20:59</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">321321</p>
+                                <span class="text-xs text-gray-500">2024-08-29 21:21:07</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">321321</p>
+                                <span class="text-xs text-gray-200">2024-08-29 21:21:56</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">2312</p>
+                                <span class="text-xs text-gray-500">2024-08-29 21:21:58</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">31231</p>
+                                <span class="text-xs text-gray-200">2024-08-29 21:24:20</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">321312</p>
+                                <span class="text-xs text-gray-500">2024-08-29 21:24:24</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">das</p>
+                                <span class="text-xs text-gray-200">2024-08-29 21:26:25</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">dsadsa</p>
+                                <span class="text-xs text-gray-500">2024-08-29 21:26:27</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">heii</p>
+                                <span class="text-xs text-gray-500">2024-08-29 21:48:13</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">heuu</p>
+                                <span class="text-xs text-gray-500">2024-08-29 21:52:54</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">ewqeqw</p>
+                                <span class="text-xs text-gray-200">2024-08-29 21:54:17</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">ewqeqw</p>
+                                <span class="text-xs text-gray-500">2024-08-29 21:54:23</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">dsad</p>
+                                <span class="text-xs text-gray-200">2024-08-29 22:06:49</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">sdsa</p>
+                                <span class="text-xs text-gray-500">2024-08-29 22:06:51</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">dsadsa</p>
+                                <span class="text-xs text-gray-500">2024-08-29 22:08:59</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">sadas</p>
+                                <span class="text-xs text-gray-200">2024-08-29 22:09:01</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">eqwq</p>
+                                <span class="text-xs text-gray-200">2024-08-29 22:12:04</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">ewqewq</p>
+                                <span class="text-xs text-gray-500">2024-08-29 22:12:06</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">sdas</p>
+                                <span class="text-xs text-gray-200">2024-08-29 22:16:48</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">dsdsa</p>
+                                <span class="text-xs text-gray-500">2024-08-29 22:16:51</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">wqwe</p>
+                                <span class="text-xs text-gray-500">2024-08-29 22:19:51</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">231</p>
+                                <span class="text-xs text-gray-200">2024-08-29 22:20:04</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">hello</p>
+                                <span class="text-xs text-gray-200">2024-08-29 23:20:46</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">ads</p>
+                                <span class="text-xs text-gray-200">2024-08-29 23:23:32</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">asdsad</p>
+                                <span class="text-xs text-gray-200">2024-08-29 23:27:22</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">dsadsa</p>
+                                <span class="text-xs text-gray-500">2024-08-29 23:27:25</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">ini dari 1</p>
+                                <span class="text-xs text-gray-200">2024-08-29 23:27:39</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">ini dari 1weqwe</p>
+                                <span class="text-xs text-gray-200">2024-08-29 23:30:50</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">ini dari 2</p>
+                                <span class="text-xs text-gray-500">2024-08-29 23:31:37</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">heii</p>
+                                <span class="text-xs text-gray-200">2024-08-29 23:35:40</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">hallo</p>
+                                <span class="text-xs text-gray-200">2024-08-30 00:25:57</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">hallo</p>
+                                <span class="text-xs text-gray-200">2024-08-30 00:26:43</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">eaaa</p>
+                                <span class="text-xs text-gray-500">2024-08-30 00:51:12</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">woii</p>
+                                <span class="text-xs text-gray-500">2024-08-30 00:52:27</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">tollol</p>
+                                <span class="text-xs text-gray-500">2024-08-30 00:52:50</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">ngeww</p>
+                                <span class="text-xs text-gray-500">2024-08-30 00:53:42</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">ehhhhhh</p>
+                                <span class="text-xs text-gray-500">2024-08-30 00:55:02</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">apaa luu</p>
+                                <span class="text-xs text-gray-200">2024-08-30 00:58:42</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">oiiii</p>
+                                <span class="text-xs text-gray-200">2024-08-30 00:59:41</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">oiiii</p>
+                                <span class="text-xs text-gray-500">2024-08-30 01:01:08</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">apaaa</p>
+                                <span class="text-xs text-gray-200">2024-08-30 01:01:23</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">dsaa</p>
+                                <span class="text-xs text-gray-200">2024-08-30 01:01:40</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">oiii</p>
+                                <span class="text-xs text-gray-200">2024-08-30 01:04:13</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">dadas</p>
+                                <span class="text-xs text-gray-200">2024-08-30 01:06:15</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">asdasd</p>
+                                <span class="text-xs text-gray-200">2024-08-30 01:06:20</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">auuu</p>
+                                <span class="text-xs text-gray-200">2024-08-30 01:06:57</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">safmasdmlasdas ngentot</p>
+                                <span class="text-xs text-gray-200">2024-08-30 01:08:09</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">dadas</p>
+                                <span class="text-xs text-gray-200">2024-08-30 01:11:29</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">dsadas</p>
+                                <span class="text-xs text-gray-200">2024-08-30 01:11:47</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">dadsa</p>
+                                <span class="text-xs text-gray-200">2024-08-30 01:11:55</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">dsadsad</p>
+                                <span class="text-xs text-gray-500">2024-08-30 01:12:05</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">dsdmkasmd</p>
+                                <span class="text-xs text-gray-200">2024-08-30 01:12:56</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">hallo</p>
+                                <span class="text-xs text-gray-200">2024-08-30 01:16:19</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">ewqewq</p>
+                                <span class="text-xs text-gray-500">2024-08-30 01:32:43</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">sadsadasdas</p>
+                                <span class="text-xs text-gray-500">2024-08-30 01:33:11</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-start mb-2">
+                            <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                                <p class="text-sm text-gray-900">jepiganteng</p>
+                                <span class="text-xs text-gray-500">2024-08-30 01:33:18</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">asd</p>
+                                <span class="text-xs text-gray-200">2024-08-30 02:21:02</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">oi mekk</p>
+                                <span class="text-xs text-gray-200">2024-08-30 02:32:41</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">butet</p>
+                                <span class="text-xs text-gray-200">2024-08-30 02:35:38</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">sdas</p>
+                                <span class="text-xs text-gray-200">2024-08-30 10:46:55</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">sss</p>
+                                <span class="text-xs text-gray-200">2024-08-30 10:51:37</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">321321</p>
+                                <span class="text-xs text-gray-200">2024-08-30 10:56:18</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">iewrji</p>
+                                <span class="text-xs text-gray-200">2024-08-30 10:56:33</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">23123</p>
+                                <span class="text-xs text-gray-200">2024-08-30 11:01:29</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">3123213231</p>
+                                <span class="text-xs text-gray-200">2024-08-30 11:01:59</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">eqwewqe</p>
+                                <span class="text-xs text-gray-200">2024-08-30 11:03:05</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">23131</p>
+                                <span class="text-xs text-gray-200">2024-08-30 11:03:26</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">23123</p>
+                                <span class="text-xs text-gray-200">2024-08-30 11:05:45</span>
+                            </div>
+                        </div>
+                                                                                <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">koonn</p>
+                                <span class="text-xs text-gray-200">2024-08-30 11:25:56</span>
+                            </div>
+                        </div>
+                                                </div>
+
+            <div class="fixed w-3/4 bottom-0 flex items-center mb-2 p-4">
+                <input type="text" id="msg" placeholder="Type your message..." class="border basis-full rounded-md py-2 px-4 mr-2 flex-grow">
+                <button id="sendMessageBtn" class="bg-green-500 hover:bg-green-700 py-2 px-2 rounded-full text-white font-bold">
+                    <svg class="w-6 h-6 rotate-90" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m12 18-7 3 7-18 7 18-7-3Zm0 0v-5" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+<div id="alert"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+<script>
+    const animasi = (id) => {
+        const test = document.getElementById(id)
+        const parent = test.parentNode
+        test.classList.add("relative")
+        test.classList.add("top-0")
+        parent.insertBefore(test, parent.firstChild)
+        anime({
+            targets: test,
+            translateY: [-50, 0],
+            scale: [0.8, 1],
+            opacity: [0, 1],
+            duration: 1000,
+            easing: 'easeOutElastic',
+            complete: () => {
+                test.style.zIndex = '';
+            }
+        });
+    }
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const socket = new WebSocket('ws://127.0.0.1:9501');
+        const token = getCookie('X-ChatAppAccessToken') || null;
+
+
+        
+        socket.onopen = async function() {
+            if (token) {
+                await GetToken();
+                socket.send(JSON.stringify({
+                    token: token,
+                    data: {
+                        action: 'auth'
+                    }
+                }));
+            }
+        };
+
+        socket.onmessage = function(event) {
+            const messageData = JSON.parse(event.data);
+            console.log(messageData);
+            handleMessage(messageData);
+        };
+
+        socket.onclose = function() {
+            showAlert('WebSocket Closed');
+        };
+
+        socket.onerror = function(error) {
+            console.error("WebSocket error: " + error.message);
+        };
+
+        document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
+        document.getElementById('msg').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        async function sendMessage() {
+            const message = document.getElementById('msg').value.trim();
+            if (message) {
+                await GetToken();
+                socket.send(JSON.stringify({
+                    token: getCookie('X-ChatAppAccessToken'),
+                    data: {
+                        action: 'message',
+                        to: getThey(),
+                        message: message,
+                    }
+                }));
+                document.getElementById('msg').value = '';
+                let box = "user" + getThey();
+                box = document.getElementById(box);
+                const container = box.parentNode;
+
+                if (container) {
+                    container.insertBefore(box, container.firstChild);
+                }
+            }
+        }
+
+        function handleMessage(messages) {
+            const {
+                type,
+                data,
+                message
+            } = messages;
+
+            if (type === 'message') {
+                if (data.from == parseInt(getThey())) {
+                    const html = `
+                    <div class="flex justify-start mb-2">
+                        <div class="bg-gray-100 p-3 rounded-r-lg rounded-bl-lg max-w-[320px]">
+                            <p class="text-sm text-gray-900">${data.message}</p>
+                            <span class="text-xs text-gray-500">${data.created_at}</span>
+                        </div>
+                    </div>`;
+                    const messagesContainer = document.getElementById('messages');
+                    messagesContainer.innerHTML += html;
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                } else if (data.from !== parseInt(getThey()) && data.to == parseInt(getThey())) {
+                    const content = `  <div class="flex justify-end mb-2">
+                            <div class="bg-blue-500 text-white p-3 rounded-l-lg rounded-br-lg max-w-[320px]">
+                                <p class="text-sm">${data.message}</p>
+                                <span class="text-xs text-gray-200">${data.created_at}</span>
+                            </div>
+                        </div>`
+                    const messagesContainer = document.getElementById('messages');
+                    messagesContainer.innerHTML += content;
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+                }
+            } else if (type === 'new') {
+                const myid = 1;
+                const fromUserId = data.from;
+                const toUserId = data.to;
+
+                if (fromUserId !== myid || toUserId !== myid) {
+                    const box = document.getElementById(fromUserId);
+
+                    if (box) {
+                        const container = box.parentNode;
+
+                        if (container) {
+                            animasi(fromUserId)
+
+                        } else {
+                            console.error("Container tidak ditemukan untuk elemen dengan id" + fromUserId + "'");
+                        }
+                    } else {
+                        console.error("Elemen dengan id " + fromUserId + "' tidak ditemukan");
+                    }
+                }
+            }
+
+
+
+        }
+
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        function showAlert(message) {
+            const toastHtml = `
+            <div id="toast-danger" class="flex z-50 items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400" role="alert">
+                <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg">
+                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z"/>
+                    </svg>
+                    <span class="sr-only">Error icon</span>
+                </div>
+                <div class="ms-3 text-sm font-normal">${message}</div>
+                <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:bg-gray-800 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-700" data-dismiss-target="#toast-danger" aria-label="Close">
+                    <span class="sr-only">Close</span>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11.25 2.75 2.75 11.25M2.75 2.75l8.5 8.5"/>
+                    </svg>
+                </button>
+            </div>`;
+            document.getElementById('alert').innerHTML = toastHtml;
+        }
+
+        const getThey = () => (new URLSearchParams(window.location.search)).get('with') || '';
+
+
+        async function GetToken() {
+            if (!token) {
+                token = await fetch('/api/auth/token').then(res => res.json());
+            }
+        }
+    });
+</script><script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js"></script>
+</body>
+</html>

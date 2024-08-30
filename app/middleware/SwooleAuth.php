@@ -20,9 +20,29 @@ class Auth
     }
     public static function decodeToken($accesstoken)
     {
-        if ($accesstoken) {
+        if (!empty($accesstoken)) {
             try {
                 $dec = JWT::decode($accesstoken, new Key(env('ACCESS_KEY'), 'HS512'));
+
+                $data = ["username" => $dec->username, "id" => $dec->id];
+                return $data;
+            } catch (\Exception $e) {
+                echo $e->getMessage();
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+    public static function decodeRefreshToken($token)
+    {
+        if (!empty($token)) {
+            try {
+                $dec = JWT::decode($token, new Key(env('SERVERKEY'), 'HS512'));
+                $IsInDb = self::Model()->VerifyToken($dec->username, $token);
+                if (!$IsInDb) {
+                    return false;
+                }
 
                 $data = ["username" => $dec->username, "id" => $dec->id];
                 return $data;
@@ -77,7 +97,7 @@ class Auth
         }
     }
 
-    private static function GenerateAccessToken($user): string
+    public static function GenerateAccessToken($user): string
     {
         $accesstokenxp = time() + 3600;
         $payload = [
@@ -165,3 +185,101 @@ class Auth
         return $accesstoken;
     }
 }
+$auth = (object) [
+    "tokenVerify" => function (Request $req, Response $res, callable $next) {
+        $model = new Usermodel();
+        $accesstoken = isset($req->cookie['X-ChatAppAccessToken']) ? $req->cookie['X-ChatAppAccessToken'] : null;
+        if (is_null($accesstoken)) {
+            $res->redirect('/login');
+            $res->end();
+            return;
+        }
+        try {
+            $dec = JWT::decode($accesstoken, new Key(env('ACCESS_KEY'), 'HS512'));
+        } catch (\Throwable $th) {
+           $res->redirect("/login");
+        }
+        if ($dec) {
+            $data = (object) ["username" => $dec->username, "id" => $dec->id];
+            Cli::info("ok");
+            $next($data);
+        } else {
+
+            try {
+                $jwt = isset($req->cookie["X-ChatAppSess"]) ? $req->cookie["X-ChatAppSess"] : null;
+                if (is_null($jwt)) {
+                    Cli::error(" no token");
+                    $res->redirect("/login");
+                }
+
+                $dec = JWT::decode($jwt, new Key(env('SERVERKEY'), 'HS512'));
+                if (!$jwt) {
+                    $res->redirect("/login");
+                }
+                $IsInDb = $model->VerifyToken($dec->username, $jwt);
+                if ($IsInDb) {
+
+                    $newAccessToken = Auth::GenerateAccessToken(["id" => $dec->id, "username" => $dec->username]);
+                    $res->cookie('X-ChatAppAccessToken', $newAccessToken, time() + 3600, '/');
+                    $data = (object) ["username" => $dec->username, "id" => $dec->id];
+                    $next($data);
+                }
+            } catch (\Exception $e) {
+                echo $e->getMessage();
+                $res->redirect("/login");
+            }
+        }
+    },
+    "guestVerify" => function (Request $req, Response $res, callable $next) {
+        $acc =  Auth::decodeToken($req->cookie['X-ChatAppAccessToken'] ?? null);
+        $ref = Auth::decodeRefreshToken($req->cookie['X-ChatAppSess'] ?? null);
+        if ($acc) {
+            $res->redirect("/");
+        }
+        if ($ref) {
+            $res->redirect("/");
+        }
+        $next();
+    },
+    "logout" => function (Request $req, Response $res, callable $next) {
+        $res->cookie("X-ChatAppSess", 'null', time() - 3600, '/',);
+        $res->cookie("X-ChatAppAccessToken", 'null', time() - 3600, '/');
+        $next();
+    }
+];
+// $tokenVerify = function (Request $req, Response $res, callable $next) {
+//     $accesstoken = isset($req->cookie['X-ChatAppAccessToken']) ? $req->cookie['X-ChatAppAccessToken'] : null;
+//     if (is_null($accesstoken)) {
+//         $res->redirect('/login');
+//         return;
+//     }
+
+//     $dec = JWT::decode($accesstoken, new Key(env('ACCESS_KEY'), 'HS512'));
+//     if ($dec) {
+//         $data = (object) ["username" => $dec->username, "id" => $dec->id];
+//         $next($data);
+//     } else {
+
+//         $jwt = isset($req->cookie["X-ChatAppSess"]) ? $req->cookie["X-ChatAppSess"] : null;
+//         if (is_null($jwt)) {
+//             Cli::error(" no token");
+//             $res->redirect("/login");
+//         }
+
+//         $dec = JWT::decode($jwt, new Key(env('SERVERKEY'), 'HS512'));
+//         if (!$dec) {
+//             $res->redirect("/");
+//             return;
+//         }
+//         $model = new Usermodel();
+
+//         $IsInDb = $model->VerifyToken($dec->username, $jwt);
+//         if ($IsInDb) {
+
+//             $newAccessToken = Auth::GenerateAccessToken(["id" => $dec->id, "username" => $dec->username]);
+//             $res->cookie('X-ChatAppAccessToken', $newAccessToken, time() + 3600, '/');
+//             $data = (object) ["username" => $dec->username, "id" => $dec->id];
+//             $next($data);
+//         }
+//     }
+// };

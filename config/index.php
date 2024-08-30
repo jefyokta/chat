@@ -53,7 +53,7 @@ function ApiResponse(array $data = [], ?string $error = null): array
         "data" => $data
     ];
 }
-function WebsocketResponse(array $data = [], ?string $type = null, ?string $message = null): array
+function WebsocketResponse(array|object $data = [], ?string $type = null, ?string $message = null): array
 {
 
     return [
@@ -68,3 +68,27 @@ function ResourcePath(string $res): string
 }
 
 date_default_timezone_set(config("app.timezone"));
+
+
+
+function MessageTime($dates): string
+{
+    $inputdate = new DateTime($dates);
+    $dateexploded = explode(" ", $dates);
+    $date = $dateexploded[0];
+    $times = $dateexploded[1];
+    $time = explode(':', $times);
+    $timezone = new DateTimeZone(config('app.timezone'));
+    $dateNow = new DateTime('now', $timezone);
+
+    $daydif = $dateNow->diff($inputdate)->days;
+
+
+    if ($daydif === 0) {
+        return "$time[0]:$time[1]";
+    } elseif ($daydif === 1) {
+        return "Yesterday $time[0]:$time[1]";
+    } else {
+        return $inputdate->format("d/m/Y h:i");
+    }
+}

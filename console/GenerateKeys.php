@@ -1,5 +1,7 @@
 <?php
 
+use Swoole\Coroutine;
+
 class GenerateKeys
 {
     private $envPath = __DIR__ . "/../.env";
@@ -20,11 +22,11 @@ class GenerateKeys
                 Cli::info(".env file created successfully!\n");
             } else {
                 Cli::error("Failed to copy .env.example to .env\n");
-                exit(1);
+                // exit(1);
             }
         } else {
             Cli::error(".env.example file does not exist\n");
-            exit(1);
+            // exit(1);
         }
     }
 
@@ -36,10 +38,11 @@ class GenerateKeys
             $this->generateENVfile();
         }
 
-        $envContent = file_get_contents($this->envPath);
+        // $envContent = file_get_contents();
+        $envContent =  Coroutine::readFile($this->envPath);
         if ($envContent === false) {
             Cli::error("Failed to read .env file\n");
-            exit(1);
+            // exit(1);
         }
 
         $lines = explode("\n", $envContent);
@@ -65,14 +68,15 @@ class GenerateKeys
 
         if ($updated) {
             $newContent = implode("\n", $lines);
-            if (file_put_contents($this->envPath, $newContent) === false) {
+
+            if (Coroutine::writeFile($this->envPath, $newContent) === false) {
                 Cli::error("Failed to write to .env file \n");
-                exit(1);
+                // exit(1);
             }
             Cli::success('SERVERKEY has been generated ' . PHP_EOL);
         } else {
             Cli::error("SERVERKEY already has a value");
-            exit(1);
+            // exit(1);
         }
     }
 
@@ -84,10 +88,12 @@ class GenerateKeys
             $this->generateENVfile();
         }
 
-        $envContent = file_get_contents($this->envPath);
+        // $envContent = file_get_contents($this->envPath);
+        $envContent =  Coroutine::readFile($this->envPath);
+
         if ($envContent === false) {
             Cli::error("Failed to read .env file\n");
-            exit(1);
+            // exit(1);
         }
 
         $lines = explode("\n", $envContent);
@@ -113,9 +119,9 @@ class GenerateKeys
 
         if ($updated) {
             $newContent = implode("\n", $lines);
-            if (file_put_contents($this->envPath, $newContent) === false) {
-                Cli::error("Failed to write to .env file\n");
-                exit(1);
+            if (Coroutine::writeFile($this->envPath, $newContent) === false) {
+                Cli::error("Failed to write to .env file \n");
+                // exit(1);
             }
             Cli::success('ACCESS_KEY has been generated ' . PHP_EOL);
         } else {

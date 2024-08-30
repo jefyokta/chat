@@ -2,29 +2,38 @@
 
 use Swoole\Http\Response;
 
+use Swoole\Coroutine;
+
 function render(Response $res, string $view, array $data = [])
 {
-    ob_start();
-    extract($data);
-    if (!file_exists(__DIR__ . "/../../resources/views/$view.php")) {
+    $baseDir = __DIR__ . "/../../resources/views/";
+
+    if (!file_exists($baseDir . "$view.php")) {
         $res->status(404);
-        //    $res->end();
-        //    exit;
-    }
+        $res->end("View not found");
 
-    include __DIR__ . "/../../resources/views/layouts/header.php";
-    include __DIR__ . "/../../resources/views/$view.php";
-    include __DIR__ . "/../../resources/views/layouts/footer.php";
-
-    $content = ob_get_clean();
-    if ($res->isWritable()) {
-        $res->end($content);
-    }
-    else{
-
+        throw new InvalidArgumentException("Views Not Found");
         return;
     }
+
+    $header = Coroutine::readFile($baseDir . "layouts/header.php") ?: '';
+    $content = Coroutine::readFile($baseDir . "$view.php") ?: '';
+    $footer = Coroutine::readFile($baseDir . "layouts/footer.php") ?: '';
+
+    extract($data);
+
+    ob_start();
+    eval('?>' . $header);
+    eval('?>' . $content);
+    eval('?>' . $footer);
+    $output = ob_get_clean();
+    // Coroutine::writeFile('index.html',$output);
+
+    if ($res->isWritable()) {
+        $res->end($output);
+    }
 }
+
 
 function SendJson(Response $response, array $data)
 {
