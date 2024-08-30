@@ -13,4 +13,4 @@
 
 </head>
 
-<body class="bg-[url('/api/img?n=splash.jpg')] bg-no-repeat min-h-screen bg-cover bg-center backdrop-blur-lg border border-gray-300 shadow-lg overflow-hidden">
+<body class="bg-[url('/api/img?n=splash.jpg')] bg-no-repeat h-screen bg-cover bg-center backdrop-blur-lg border border-gray-300 shadow-lg overflow-hidden">

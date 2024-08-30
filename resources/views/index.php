@@ -33,14 +33,14 @@
             <div class="px-5 mb-3">
                 <h1 class="text-xl font-semibold text-cyan-200">Chats</h1>
             </div>
-            <ul class="max-w-md shadow-lg divide-y p-5 divide-gray-200 overflow-y-auto relative  shadow bg-emerald-300/10 mx-2 rounded-md"
-                style="max-height: 75%;height:75%;">
+            <ul class=" userlist max-w-md shadow-lg divide-y p-5 divide-gray-200 overflow-y-scroll relative bg-emerald-300/10 mx-2 rounded-md">
+
                 <?php foreach ($users as $user): ?>
                     <a href="/messages?with=<?= htmlspecialchars($user['id']) ?>" class="pb-3 sm:pb-4" id="user<?= $user['id'] ?>">
                         <div class="flex my-1 items-center space-x-4 p-2 px-4 hover:shadow hover:bg-slate-200/10 hover:rounded-md border-cyan-200/30 border-b-2" style="border-bottom-width: 1px;">
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-medium text-gray-200 truncate"><?= htmlspecialchars($user['username']); ?></p>
-                                <p class="text-sm text-gray-500 truncate">email@flowbite.com</p>
+                                <p class="text-sm text-gray-500 truncate">#<?= $user['id']; ?></p>
                             </div>
                         </div>
                     </a>
@@ -92,7 +92,7 @@
         </div>
     <?php else: ?>
         <div class="w-full md:w-3/4 md:right-0 lg:w-4/5 absolute h-full flex flex-col justify-center items-center backdrop-blur-lg rounded-md py-2">
-            <div class="w-full  relative h-full bg-blue-950/50 backdrop-blur-lg rounded-md flex flex-col justify-center items-center ">
+            <div class="w-full overflow-hidden relative h-full bg-blue-950/50 backdrop-blur-lg rounded-md flex flex-col justify-center items-center ">
 
                 <div class="bubble bg-indigo-400/80"></div>
                 <div class="bubble bg-teal-300/80"></div>
@@ -149,7 +149,7 @@
     const Logout = async () => {
 
         const IsConfirmed = confirm("mau logout?")
-        if(!IsConfirmed){
+        if (!IsConfirmed) {
             return
         }
 
@@ -204,35 +204,38 @@
 
 
         const bubbles = document.querySelectorAll('.bubble');
+        if (bubbles) {
 
-        function updateBubble(bubble) {
-            const startX = Math.random() * 100;
-            const startY = Math.random() * 100;
-            const endX = Math.random() * 100;
-            const endY = Math.random() * 100;
-            const duration = 10;
+            function updateBubble(bubble) {
+                const startX = Math.random() * 100;
+                const startY = Math.random() * 100;
+                const endX = Math.random() * 100;
+                const endY = Math.random() * 100;
+                const duration = 10;
 
-            bubble.style.width = `${Math.random() * 250 + 100}px`;
-            bubble.style.height = bubble.style.width;
-            bubble.style.left = `${startX}%`;
-            bubble.style.top = `${startY}%`;
-            bubble.style.animation = `moveBubble ${duration}s ease-in-out infinite`;
+                bubble.style.width = `${Math.random() * 250 + 100}px`;
+                bubble.style.height = bubble.style.width;
+                bubble.style.left = `${startX}%`;
+                bubble.style.top = `${startY}%`;
+                bubble.style.animation = `moveBubble ${duration}s ease-in-out infinite`;
 
-            bubble.style.setProperty('--start-x', `calc(${startX}% - 50%)`);
-            bubble.style.setProperty('--start-y', `calc(${startY}% - 50%)`);
-            bubble.style.setProperty('--end-x', `calc(${endX}% - 50%)`);
-            bubble.style.setProperty('--end-y', `calc(${endY}% - 50%)`);
-            setTimeout(() => updateBubble(bubble), duration * 1000);
+                bubble.style.setProperty('--start-x', `calc(${startX}% - 50%)`);
+                bubble.style.setProperty('--start-y', `calc(${startY}% - 50%)`);
+                bubble.style.setProperty('--end-x', `calc(${endX}% - 50%)`);
+                bubble.style.setProperty('--end-y', `calc(${endY}% - 50%)`);
+                setTimeout(() => updateBubble(bubble), duration * 1000);
 
+            }
+
+            bubbles.forEach((bubble, index) => {
+                const delay = index * 500;
+                setTimeout(() => {
+                    updateBubble(bubble);
+                    setInterval(() => updateBubble(bubble), 10000);
+                }, delay);
+            });
         }
 
-        bubbles.forEach((bubble, index) => {
-            const delay = index * 500;
-            setTimeout(() => {
-                updateBubble(bubble);
-                setInterval(() => updateBubble(bubble), 10000);
-            }, delay);
-        });
 
 
         const messagesContainer = document.getElementById('messages');

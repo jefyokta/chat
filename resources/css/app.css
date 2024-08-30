@@ -40,6 +40,10 @@
     /* backdrop-filter: blur(1px); */
 }
 
+.userlist{
+    height: 64% ;
+}
+
 .bubble {
     position: absolute;
     border-radius: 50%;
@@ -77,3 +81,10 @@
       opacity: 0;
     }
   }
+  @media (min-width: 768px) {
+
+    .userlist{
+        height: 75% !important;
+    }
+
+   }
