@@ -14,11 +14,8 @@ class Test
     public function run()
     {
 
-        Coroutine::run(function(){
-        //   $exist =  Coroutine::readFile(__DIR__."/okta.php") ?:false;
-        //   echo $exist ? "iya" :"ngga";
-        // var_dump($exist);
-        
-        });
+       $users = UserModel::search("jefyokta");
+       var_dump($users);
+       
     }
 }

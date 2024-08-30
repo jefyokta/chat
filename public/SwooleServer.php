@@ -61,7 +61,7 @@ $app->get("/login", function (Request $request, Response $response) {
 
 $app->get('/', function (Request $request, Response $response, $user) {
     $users =  UserModel::getMyMessage($user->id);
-    render($response, 'index', ['username' => $user->username, 'users' => $users]);
+    render($response, 'index', ['username' => $user->username, 'users' => $users,"userid"=>$user->id]);
 }, [$auth->tokenVerify]);
 
 
@@ -112,28 +112,61 @@ $app->get("/messages", function (Request $req, Response $res, $user) {
         "users" => $users
     ]);
 }, [$auth->tokenVerify]);
+$app->get("/search",function( Request $request, Response $res, $user){
+    $username = $request->get['username'] ?: false;
+    if (!$username) {
+        $res->setStatusCode(404);
+        $res->end();
+    }
+    $users =  UserModel::getMyMessage($user->id);
+
+    $search = UserModel::search($username);
+
+ render($res, 'index', ['username' => $user->username, 'users' => $users,"userid"=>$user->id,"search"=>$search]);
+
+},[$auth->tokenVerify]);
 
 $app->get("/api/js", function (Request $req, Response $res) {
     $js = $req->get['n'] ?: false;
     if (!$js) {
-        $res->setStatusCode(400);
+        $res->setStatusCode(404);
         $res->end();
+    }
+    if (strpos($js,'/') !== false) {
+        $res->setStatusCode(404);
+        $res->end();
+
     }
     $res->sendfile(ResourcePath("js/$js"));
 });
+
+
+
+
 $app->get("/api/css", function (Request $req, Response $res) {
     $css = $req->get['n'] ?: false;
     if (!$css) {
-        $res->setStatusCode(400);
+        $res->setStatusCode(404);
         $res->end();
+    }
+    if (strpos($css,'/') !==false) {
+        $res->setStatusCode(404);
+        $res->end();
+
     }
     $res->sendfile(ResourcePath("css/$css"));
 });
 $app->get("/api/img", function (Request $req, Response $res) {
     $img = $req->get['n'] ?: false;
     if (!$img) {
-        $res->setStatusCode(400);
+        $res->setStatusCode(404);
         $res->end();
+    }
+    if (strpos($img,'/') !== false) {
+        $res->setStatusCode(404);
+        $res->end();
+
+
     }
     $res->sendfile(ResourcePath("img/$img"));
 });

@@ -2,7 +2,7 @@ const handleSize = () => {
   const width = window.innerWidth;
   const height = window.innerHeight;
   if (width < height) {
-    alert("developer malas ngurus reponsive");
+    // alert("developer malas ngurus reponsive");
   } else {
     console.log("ok");
   }

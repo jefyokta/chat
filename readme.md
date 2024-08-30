@@ -1,5 +1,8 @@
 # ChatApp
 
+Built with php native + Openswoole
+
+
 ## requirement
 
 - php 8.2+
