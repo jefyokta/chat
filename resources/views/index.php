@@ -11,7 +11,22 @@
             <div class="p-5">
                 <div class="bg-slate-300/20 px-3 p-2 rounded-lg backdrop-blur-xl shadow-sm w-full">
                     <p class="text-cyan-300">Welcome!</p>
-                    <h1 class="text-slate-100 text-2xl pb-2.5 ">@<?= htmlspecialchars($data['username']); ?></h1>
+                    <div class="flex w-full justify-between items-center">
+
+                        <h1 class="text-slate-100 text-2xl  ">@<?= htmlspecialchars($data['username']); ?></h1>
+                        <button onclick="Logout()">
+                            <svg height="14px" width="14px" version="1.1" style="opacity: .7;" fill="#f87171" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 30.143 30.143" xml:space="preserve">
+                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                <g id="SVGRepo_iconCarrier">
+                                    <g>
+                                        <path d="M20.034,2.357v3.824c3.482,1.798,5.869,5.427,5.869,9.619c0,5.98-4.848,10.83-10.828,10.83 c-5.982,0-10.832-4.85-10.832-10.83c0-3.844,2.012-7.215,5.029-9.136V2.689C4.245,4.918,0.731,9.945,0.731,15.801 c0,7.921,6.42,14.342,14.34,14.342c7.924,0,14.342-6.421,14.342-14.342C29.412,9.624,25.501,4.379,20.034,2.357z"></path>
+                                        <path d="M14.795,17.652c1.576,0,1.736-0.931,1.736-2.076V2.08c0-1.148-0.16-2.08-1.736-2.08 c-1.57,0-1.732,0.932-1.732,2.08v13.496C13.062,16.722,13.225,17.652,14.795,17.652z"></path>
+                                    </g>
+                                </g>
+                            </svg>
+                        </button>
+                    </div>
                     <a href="/" class="text-xs text-teal-200 px-2 rounded-md bg-slate-100/10">to /</a>
                 </div>
             </div>
@@ -116,6 +131,16 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 <script>
+    const Logout = async () => {
+
+        confirm("mau logout?")
+
+        await fetch(`/logout`, {
+            method: "delete"
+        })
+        location.href = "/login"
+
+    }
     const showSidebar = () => {
         const sidebar = document.getElementById('people');
         sidebar.classList.remove('hidden');

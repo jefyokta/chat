@@ -12,6 +12,11 @@
 
         </div>
         <button type="button" onclick="Register()" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">register</button>
+        </div>
+  </div>
+  <div class="flex justify-end">
+    <a href="/login" class="text-blue-800 underline">Login</a>
+  </div>
 </form>
 <script>
     const Register = async () => {
@@ -34,8 +39,10 @@
         console.log(result)
 
         if (result.ok) {
-            location.href = result.url
+            alert("berhasil login")
+            location.href = "/login"
         } else {
+            alert("username sudah dipakai")
             console.error('Error:', data);
         }
 
