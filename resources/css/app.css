@@ -28,3 +28,52 @@
 .toast.hide {
     animation: slideOut 0.5s forwards;
 }
+::-webkit-scrollbar {
+    display: none;
+    -ms-overflow-style: none;
+  }
+.hero{
+    width: 30%;
+    height: 40%;
+    z-index: -1;
+    /* filter: blur(10px); */
+    /* backdrop-filter: blur(1px); */
+}
+
+.bubble {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    z-index: -1;
+    will-change: transform, opacity;
+
+    /* background: rgba(0, 51, 102, 0.5); */
+    box-shadow: 0 0 30px rgba(0, 51, 102, 0.5);
+    opacity: 0;
+}
+  
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 0%;
+    }
+    50% {
+      background-position: 100% 100%;
+    }
+    100% {
+      background-position: 0% 0%;
+    }
+  }
+  
+  @keyframes moveBubble {
+    0% {
+      transform: translate(var(--start-x), var(--start-y));
+      opacity: 0;
+    }
+    50%{
+        opacity: .5;
+    }
+    100% {
+      transform: translate(var(--end-x), var(--end-y));
+      opacity: 0;
+    }
+  }

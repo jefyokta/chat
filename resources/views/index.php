@@ -1,20 +1,20 @@
 <div class="flex w-full h-full">
     <!-- Sidebar -->
-    <div id="people" class="fixed transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out hidden md:block w-full md:w-1/4 lg:w-1/5 h-screen p-2" style="z-index: 49;">
-        <div class="relative bg-gradient-to-b from-slate-950/90 to-blue-950/90 backdrop-blur-lg border border-gray-300 border-opacity-30 overflow-y-scroll h-full rounded-md">
+    <div id="people" class="fixed transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out hidden md:block w-full md:w-1/4 lg:w-1/5 h-screen p-2 px-1" style="z-index: 49;">
+        <div class="relative bg-gradient-to-b from-slate-950/80 to-blue-950/90 backdrop-blur-lg border border-gray-300 border-opacity-30  h-full rounded-md">
             <div class="flex justify-end md:hidden p-5">
-                <button onclick="closeSidebar()" class="text-white"><svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                <button onclick="closeSidebar()" class="text-white"><svg class="w-6 h-6  text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                         <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm7.707-3.707a1 1 0 0 0-1.414 1.414L10.586 12l-2.293 2.293a1 1 0 1 0 1.414 1.414L12 13.414l2.293 2.293a1 1 0 0 0 1.414-1.414L13.414 12l2.293-2.293a1 1 0 0 0-1.414-1.414L12 10.586 9.707 8.293Z" clip-rule="evenodd" />
                     </svg>
                 </button>
             </div>
-            <div class="p-5">
-                <div class="bg-slate-300/20 px-3 p-2 rounded-lg backdrop-blur-xl shadow-sm w-full">
+            <div class="px-2.5 py-5">
+                <div class="bg-indigo-100/20 px-3 p-2 shadow-lg rounded-lg backdrop-blur-xl  w-full">
                     <p class="text-cyan-300">Welcome!</p>
                     <div class="flex w-full justify-between items-center">
 
                         <h1 class="text-slate-100 text-2xl  ">@<?= htmlspecialchars($data['username']); ?></h1>
-                        <button onclick="Logout()">
+                        <button onclick="Logout()" class="hover:bg-slate-100/20 p-1 rounded-md">
                             <svg height="14px" width="14px" version="1.1" style="opacity: .7;" fill="#f87171" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 30.143 30.143" xml:space="preserve">
                                 <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                                 <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -30,13 +30,14 @@
                     <a href="/" class="text-xs text-teal-200 px-2 rounded-md bg-slate-100/10">to /</a>
                 </div>
             </div>
-            <div class="px-5">
+            <div class="px-5 mb-3">
                 <h1 class="text-xl font-semibold text-cyan-200">Chats</h1>
             </div>
-            <ul class="max-w-md divide-y p-5 divide-gray-200 overflow-y-scroll relative">
+            <ul class="max-w-md shadow-lg divide-y p-5 divide-gray-200 overflow-y-auto relative  shadow bg-emerald-300/10 mx-2 rounded-md"
+                style="max-height: 75%;height:75%;">
                 <?php foreach ($users as $user): ?>
                     <a href="/messages?with=<?= htmlspecialchars($user['id']) ?>" class="pb-3 sm:pb-4" id="user<?= $user['id'] ?>">
-                        <div class="flex items-center space-x-4 p-2 px-4 hover:bg-slate-200/10 rounded-md">
+                        <div class="flex my-1 items-center space-x-4 p-2 px-4 hover:shadow hover:bg-slate-200/10 hover:rounded-md border-cyan-200/30 border-b-2" style="border-bottom-width: 1px;">
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-medium text-gray-200 truncate"><?= htmlspecialchars($user['username']); ?></p>
                                 <p class="text-sm text-gray-500 truncate">email@flowbite.com</p>
@@ -90,36 +91,50 @@
             </div>
         </div>
     <?php else: ?>
-        <div class="w-full md:w-3/4 md:right-0 lg:w-4/5 absolute h-5/6 flex flex-col justify-center items-center bg-blue-900/30 backdrop-blur-lg rounded-md my-10">
-            <div>
+        <div class="w-full md:w-3/4 md:right-0 lg:w-4/5 absolute h-full flex flex-col justify-center items-center backdrop-blur-lg rounded-md py-2">
+            <div class="w-full  relative h-full bg-blue-950/50 backdrop-blur-lg rounded-md flex flex-col justify-center items-center ">
+
+                <div class="bubble bg-indigo-400/80"></div>
+                <div class="bubble bg-teal-300/80"></div>
+                <div class="bubble bg-blue-300/80"></div>
+                <div class="bubble bg-indigo-300/80"></div>
+                <div class="bubble bg-purple-400/80"></div>
+                <div class="bubble bg-pink-300/80"></div>
+                <div class="bubble bg-teal-400/80"></div>
+                <div class="bubble bg-cyan-200/80"></div>
+                <div class="bubble bg-blue-200/80"></div>
+                <div class="bubble bg-indigo-200/80"></div>
                 <h1 class="text-4xl text-cyan-300 font-semibold text-center mb-5">
 
                     ChatApp</h1>
-                <button class="md:hidden text-cyan-100 text-center w-full p-2 bg-cyan-200/20 rounded-md mb-5" onclick="showSidebar()">Open Chat
+                <button class="md:hidden text-cyan-100 mx-5 text-center w-full p-2 bg-cyan-200/20 rounded-md mb-5" onclick="showSidebar()">Open Chat
                 </button>
-                <p class="text-center">Search For User</p>
+                <p class="text-center text-yellow-400">Search For User</p>
                 <form action="/search" class="my-5">
                     <input type="text" class="bg-slate-300/10 w-full h-10 border-0 text-white rounded-md text-center" name="username" placeholder="Username......">
                 </form>
                 <?php if (isset($search)) : ?>
-                    <div class="bg-cyan-700/10 rounded-md py-5 px-2 overflow-x-scroll max-h-60">
-                        <?php foreach ($search as $s): ?>
-                            <?php if ($s['id'] !== $userid) { ?>
-                                <div class="flex justify-between mb-1 bg-slate-100/10 p-2 rounded-md">
-                                    <h1 class="text-cyan-200">
-                                        <?= $s['username']; ?>
-                                    </h1>
-                                    <a href="/messages?with=<?= $s['id'] ?>">
-                                        <svg class="w-6 h-6 text-gray-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                            <path fill-rule="evenodd" d="M3 5.983C3 4.888 3.895 4 5 4h14c1.105 0 2 .888 2 1.983v8.923a1.992 1.992 0 0 1-2 1.983h-6.6l-2.867 2.7c-.955.899-2.533.228-2.533-1.08v-1.62H5c-1.105 0-2-.888-2-1.983V5.983Zm5.706 3.809a1 1 0 1 0-1.412 1.417 1 1 0 1 0 1.412-1.417Zm2.585.002a1 1 0 1 1 .003 1.414 1 1 0 0 1-.003-1.414Zm5.415-.002a1 1 0 1 0-1.412 1.417 1 1 0 1 0 1.412-1.417Z" clip-rule="evenodd" />
-                                        </svg>
+                    <h1 class="my-2 text-slate-200 font-semibold">Result </h1>
+                    <div class="bg-cyan-200/10 rounded-md py-5 px-5 w-full md:w-9/12  max-h-60">
+                        <div class=" rounded-md py-5 px-5 w-full max-h-full overflow-x-scroll ">
+                            <?php foreach ($search as $s): ?>
+                                <?php if ($s['id'] !== $userid) { ?>
+                                    <div class="flex justify-between mb-1 bg-white/30 p-2 rounded-md">
+                                        <h1 class="text-slate-900">
+                                            <?= $s['username']; ?>
+                                        </h1>
+                                        <a href="/messages?with=<?= $s['id'] ?>">
+                                            <svg class="w-6 h-6 text-gray-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                                <path fill-rule="evenodd" d="M3 5.983C3 4.888 3.895 4 5 4h14c1.105 0 2 .888 2 1.983v8.923a1.992 1.992 0 0 1-2 1.983h-6.6l-2.867 2.7c-.955.899-2.533.228-2.533-1.08v-1.62H5c-1.105 0-2-.888-2-1.983V5.983Zm5.706 3.809a1 1 0 1 0-1.412 1.417 1 1 0 1 0 1.412-1.417Zm2.585.002a1 1 0 1 1 .003 1.414 1 1 0 0 1-.003-1.414Zm5.415-.002a1 1 0 1 0-1.412 1.417 1 1 0 1 0 1.412-1.417Z" clip-rule="evenodd" />
+                                            </svg>
 
-                                    </a>
-                                </div>
-                            <?php  }; ?>
+                                        </a>
+                                    </div>
+                                <?php  }; ?>
 
 
-                        <?php endforeach; ?>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
                 <?php endif; ?>
             </div>
@@ -133,7 +148,10 @@
 <script>
     const Logout = async () => {
 
-        confirm("mau logout?")
+        const IsConfirmed = confirm("mau logout?")
+        if(!IsConfirmed){
+            return
+        }
 
         await fetch(`/logout`, {
             method: "delete"
@@ -184,6 +202,37 @@
         const socket = new WebSocket('ws://<?= config('ws.host') ?>:<?= config("ws.port") ?>');
         const token = getCookie('X-ChatAppAccessToken') || null;
 
+
+        const bubbles = document.querySelectorAll('.bubble');
+
+        function updateBubble(bubble) {
+            const startX = Math.random() * 100;
+            const startY = Math.random() * 100;
+            const endX = Math.random() * 100;
+            const endY = Math.random() * 100;
+            const duration = 10;
+
+            bubble.style.width = `${Math.random() * 250 + 100}px`;
+            bubble.style.height = bubble.style.width;
+            bubble.style.left = `${startX}%`;
+            bubble.style.top = `${startY}%`;
+            bubble.style.animation = `moveBubble ${duration}s ease-in-out infinite`;
+
+            bubble.style.setProperty('--start-x', `calc(${startX}% - 50%)`);
+            bubble.style.setProperty('--start-y', `calc(${startY}% - 50%)`);
+            bubble.style.setProperty('--end-x', `calc(${endX}% - 50%)`);
+            bubble.style.setProperty('--end-y', `calc(${endY}% - 50%)`);
+            setTimeout(() => updateBubble(bubble), duration * 1000);
+
+        }
+
+        bubbles.forEach((bubble, index) => {
+            const delay = index * 500;
+            setTimeout(() => {
+                updateBubble(bubble);
+                setInterval(() => updateBubble(bubble), 10000);
+            }, delay);
+        });
 
 
         const messagesContainer = document.getElementById('messages');
