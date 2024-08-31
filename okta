@@ -4,6 +4,15 @@ use oktaa\Seeder\Seeder;
 use Swoole\Coroutine;
 
 fwrite(STDOUT, "\n");
+/**
+ * 
+ * ---------------------------------------
+ * Get app.json file                      |
+ * ---------------------------------------
+ * 
+ * 
+ */
+$app = json_decode(file_get_contents("app.json"), true);
 
 /**
  * 
@@ -13,6 +22,27 @@ fwrite(STDOUT, "\n");
  * 
  */
 require_once __DIR__ . "/console/Style.php";
+/**
+ * 
+ * ---------------------------------------
+ * Extenstions Validations                |
+ * ---------------------------------------
+ * 
+ */
+$extensions = get_loaded_extensions();
+
+$required_extensions = $app['required']['extensions'];
+$extension_errors = [];
+foreach ($required_extensions as $rextenstion):
+    if (!in_array($rextenstion, $extensions)) {
+        array_push($extension_errors, $rextenstion);
+    }
+endforeach;
+
+if (count($extension_errors) > 0) {
+    $extens = implode(" \n ", $extension_errors);
+    Cli::warning(" You need to enable php extension(s): \n\n $extens \n\n");
+}
 
 /**
  * 
@@ -61,15 +91,6 @@ require_once __DIR__ . "/app/init.php";
 require_once __DIR__ . "/database/Seeder.php";
 
 
-/**
- * 
- * ---------------------------------------
- * Get app.json file                      |
- * ---------------------------------------
- * 
- * 
- */
-$app = json_decode(file_get_contents("app.json"), true);
 
 
 /**
@@ -91,27 +112,7 @@ $commands = [
     "generate-keys"=>"Generate SERVERKEY/ACCESSKEY"
 ];
 
-/**
- * 
- * ---------------------------------------
- * Extenstions Validations                |
- * ---------------------------------------
- * 
- */
-$extensions = get_loaded_extensions();
 
-$required_extensions = $app['required']['extensions'];
-$extension_errors = [];
-foreach ($required_extensions as $rextenstion):
-    if (!in_array($rextenstion, $extensions)) {
-        array_push($extension_errors, $rextenstion);
-    }
-endforeach;
-
-if (count($extension_errors) > 0) {
-    $extens = implode(" \n ", $extension_errors);
-    Cli::warning(" You need to enable php extension(s): \n\n $extens \n\n");
-}
 /**
  * 
  * ---------------------------------------
