@@ -286,7 +286,6 @@
             if (message) {
                 await GetToken();
                 try {
-                    // Pastikan socket sudah terbuka
                     if (socket.readyState === WebSocket.OPEN) {
                         socket.send(JSON.stringify({
                             token: getCookie('X-ChatAppAccessToken'),
@@ -297,10 +296,8 @@
                             }
                         }));
 
-                        // Bersihkan input pesan
                         document.getElementById('msg').value = '';
 
-                        // Update UI: Pindahkan elemen pesan baru ke atas
                         let box = document.getElementById("user" + getThey());
                         if (box) {
                             const container = box.parentNode;
