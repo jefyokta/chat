@@ -18,23 +18,28 @@ use oktaa\SwooleApp\App;
 use Swoole\Coroutine;
 
 $logMiddleware = function (Request $request, Response $response, $next) {
+    $query = $request->get;
+    $queryurl = '';
+    if (!empty($query)) {
+        foreach ($query as $q => $val) {
+            $queryurl .= urlencode($q) . '=' . urlencode($val) . '&';
+        }
+        $queryurl = rtrim($queryurl, '&');
+        $queryurl = '?' . $queryurl;
+    }
     try {
         $next();
-        $text = "[" . date("d/m/Y H:i") . "] " . $request->server['remote_addr'] . ":  " . $request->server['request_method'] . " " . $request->server['request_uri'];
+        $text = "[" . date("d/m/Y H:i") . "] " . $request->server['remote_addr'] . ":  " . $request->server['request_method'] . " " . $request->server['request_uri'] . $queryurl;
         Console::log($text);
         Coroutine::writeFile(__DIR__ . "/../storage/logs/logs", $text . PHP_EOL, FILE_APPEND);
     } catch (\Throwable $th) {
-        echo json_encode($th);
-        // $response->getStatusCode();
-
-
-        $text = "[" . date("d/m/Y H:i") . "] " . $request->server['remote_addr'] . ":  " . $request->server['request_method'] . " " . $request->server['request_uri'];
+        // echo json_encode($th);
+        $text = "[" . date("d/m/Y H:i") . "] " . $request->server['remote_addr'] . ":  " . $request->server['request_method'] . " " . $request->server['request_uri'] . $queryurl;
         Coroutine::writeFile(__DIR__ . "/../storage/logs/error_logs", $text . "  " . $th->getMessage() . PHP_EOL, FILE_APPEND);
         $file =  Coroutine::readFile($th->getFile()) ?: null;
         $filelines = explode("\n", $file) ?: null;
         $errorline = is_array($filelines) ? $filelines[$th->getLine() - 1] : "unknown";
         Console::error($th->getMessage());
-        // var_dump($th->getCode());
         render($response, 'error/error', [
             "code" => $th->getCode(),
             "message" => $th->getMessage(),
@@ -52,6 +57,7 @@ $host = $hosts[0];
 
 $app = new App($host, $port);
 
+
 $app->use($logMiddleware);
 
 
@@ -61,7 +67,7 @@ $app->get("/login", function (Request $request, Response $response) {
 
 $app->get('/', function (Request $request, Response $response, $user) {
     $users =  UserModel::getMyMessage($user->id);
-    render($response, 'index', ['username' => $user->username, 'users' => $users,"userid"=>$user->id]);
+    render($response, 'index', ['username' => $user->username, 'users' => $users, "userid" => $user->id]);
 }, [$auth->tokenVerify]);
 
 
@@ -86,6 +92,7 @@ $app->get("/messages", function (Request $req, Response $res, $user) {
     if (empty($theirid)) {
         $res->setStatusCode(404, "not Found");
         $res->end();
+        return $res;
     }
     $users =  UserModel::getMyMessage($user->id);
 
@@ -112,7 +119,7 @@ $app->get("/messages", function (Request $req, Response $res, $user) {
         "users" => $users
     ]);
 }, [$auth->tokenVerify]);
-$app->get("/search",function( Request $request, Response $res, $user){
+$app->get("/search", function (Request $request, Response $res, $user) {
     $username = $request->get['username'] ?: false;
     if (!$username) {
         $res->setStatusCode(404);
@@ -122,9 +129,8 @@ $app->get("/search",function( Request $request, Response $res, $user){
 
     $search = UserModel::search($username);
 
- render($res, 'index', ['username' => $user->username, 'users' => $users,"userid"=>$user->id,"search"=>$search]);
-
-},[$auth->tokenVerify]);
+    render($res, 'index', ['username' => $user->username, 'users' => $users, "userid" => $user->id, "search" => $search]);
+}, [$auth->tokenVerify]);
 
 $app->get("/api/js", function (Request $req, Response $res) {
     $js = $req->get['n'] ?: false;
@@ -132,10 +138,9 @@ $app->get("/api/js", function (Request $req, Response $res) {
         $res->setStatusCode(404);
         $res->end();
     }
-    if (strpos($js,'/') !== false) {
+    if (strpos($js, '/') !== false) {
         $res->setStatusCode(404);
         $res->end();
-
     }
     $res->sendfile(ResourcePath("js/$js"));
 });
@@ -149,10 +154,9 @@ $app->get("/api/css", function (Request $req, Response $res) {
         $res->setStatusCode(404);
         $res->end();
     }
-    if (strpos($css,'/') !==false) {
+    if (strpos($css, '/') !== false) {
         $res->setStatusCode(404);
         $res->end();
-
     }
     $res->sendfile(ResourcePath("css/$css"));
 });
@@ -162,11 +166,9 @@ $app->get("/api/img", function (Request $req, Response $res) {
         $res->setStatusCode(404);
         $res->end();
     }
-    if (strpos($img,'/') !== false) {
+    if (strpos($img, '/') !== false) {
         $res->setStatusCode(404);
         $res->end();
-
-
     }
     $res->sendfile(ResourcePath("img/$img"));
 });
