@@ -6,3 +6,5 @@ index.txt
 output
 /node_modules
 index.html
+.DS_Store
+index2.html
