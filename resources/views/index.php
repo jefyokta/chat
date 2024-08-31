@@ -107,7 +107,7 @@
                 <h1 class="text-4xl text-cyan-300 font-semibold text-center mb-5">
 
                     ChatApp</h1>
-                <button class="md:hidden text-cyan-100 mx-5 text-center w-full p-2 bg-cyan-200/20 rounded-md mb-5" onclick="showSidebar()">Open Chat
+                <button class="md:hidden text-cyan-100 mx-5 text-center w-max/6 p-2 bg-cyan-200/20 rounded-md mb-5" onclick="showSidebar()">Open Chat
                 </button>
                 <p class="text-center text-yellow-400">Search For User</p>
                 <form action="/search" class="my-5">

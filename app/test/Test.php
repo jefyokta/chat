@@ -1,21 +1,28 @@
 <?php
 
-use oktaa\model\MessageModel;
-use oktaa\model\UserModel;
 use Swoole\Coroutine;
-use Swoole\Coroutine\Http\Client;
-use Swoole\Coroutine\Scheduler;
-use Swoole\Event;
+use Swoole\WebSocket\Server;
+use Swoole\Http\Request;
+use Swoole\Http\Response;
 use Swoole\Timer;
 
 class Test
 {
-
     public function run()
     {
+        Coroutine::run(function () {
 
-       $users = UserModel::search("jefyokta");
-       var_dump($users);
-       
+            go(function () {
+                $i = 1;
+                echo "helo {$i}x\n";
+                Timer::tick(1000, function () use (&$i) {
+                    $i += 1;
+                    echo "helo ".$i."x".PHP_EOL;
+                });
+            });
+            go(function(){
+                echo "ntah".PHP_EOL;
+            });
+        });
     }
 }
