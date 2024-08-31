@@ -6,6 +6,7 @@ use Swoole\Http\Server;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use oktaa\console\Console;
+use Swoole\Coroutine;
 
 class App
 {
@@ -99,14 +100,15 @@ class App
 
             $middlewareStack = array_merge($routeMiddleware, [
                 function ($request, $response, $next, $params = null) use ($handler) {
-                    $handler($request, $response, $params); // Pass the params to the handler
+                    $handler($request, $response, $params); 
                 }
             ]);
 
             $this->runMiddlewareStack($middlewareStack, $request, $response);
         } else {
             $response->status(404);
-            $response->end("Not Found");
+            $page = Coroutine::readFile(__DIR__."/../../resources/views/error/404.php");
+            $response->end($page);
         }
     }
 

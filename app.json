@@ -1,6 +1,6 @@
 {
     "required":{
-        "extensions":["openswoole","jembot"],
+        "extensions":["openswoole"],
         "php-version":">= 8.1.0."
     },
    "commands": {
