@@ -14,7 +14,7 @@ class App
     protected $routes = [];
     protected $middleware = [];
 
-    public function __construct($host, $port)
+    public function __construct(string $host, int $port)
     {
         $this->server = new Server($host, $port);
         $this->server->on("start", function (Server $server) use ($host, $port) {
@@ -33,6 +33,7 @@ class App
             'middleware' => $middleware
         ];
     }
+    
 
     public function get(string $path, callable $handler, array $middleware = [])
     {
@@ -62,7 +63,11 @@ class App
     protected function handleRequest(Request $request, Response $response)
     {
         $method = $request->server['request_method'];
+    
         $path = $request->server['request_uri'];
+        $path = filter_var($path, FILTER_SANITIZE_URL);
+        $path = rtrim($path,"/");
+        
 
         $middlewareStack = array_merge($this->middleware, [
             function ($request, $response, $next) use ($method, $path) {
@@ -81,6 +86,7 @@ class App
                 if (is_callable($middleware)) {
                     $middleware($request, $response, $next, $params);
                 } else {
+                    
                     Console::error("Middleware is not callable.");
                     $response->status(500);
                     $response->end("Internal Server Error");
@@ -91,7 +97,7 @@ class App
         $next($params);
     }
 
-    protected function processRequest(Request $request, Response $response, $method, $path, $next)
+    protected function processRequest(Request $request, Response $response, string $method, string $path, $next)
     {
         if (isset($this->routes[$method][$path])) {
             $route = $this->routes[$method][$path];
