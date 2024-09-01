@@ -66,7 +66,7 @@ class App
     
         $path = $request->server['request_uri'];
         $path = filter_var($path, FILTER_SANITIZE_URL);
-        $path = rtrim($path,"/");
+        // $path = rtrim($path,"/");
         
 
         $middlewareStack = array_merge($this->middleware, [

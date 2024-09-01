@@ -60,7 +60,7 @@ class Auth
         $accesstoken = isset($req->cookie[self::$accesstokenName]) ? $req->cookie[self::$accesstokenName] : null;
         if (is_null($accesstoken)) {
             $res->redirect('/login');
-            return;
+            // return;
         }
 
         $dec = JWT::decode($accesstoken, new Key(env('ACCESS_KEY'), 'HS512'));
@@ -116,7 +116,6 @@ class Auth
 
             $r = json_decode($req->rawContent(), true);
 
-            // Validasi pengguna
             $user = UserModel::select("*")->where("username", '=', $r['username'])->first();
 
             if (isset($user->scalar) && !$user->scalar) {

@@ -1,5 +1,6 @@
 <?php
 
+use oktaa\model\UserModel;
 use Swoole\Coroutine;
 use Swoole\Coroutine\Http\Client;
 
@@ -22,16 +23,21 @@ class Test
 {
     public function run()
     {
-        function rangeGenerator($start, $end) {
-            for ($i = $start; $i <= $end; $i++) {
-                yield $i;
-            }
-        }
-        var_dump(rangeGenerator(1,6));
-        
-        
-        // foreach (rangeGenerator(1, 5) as $number) {
-        //     echo $number . ' '; // Output: 1 2 3 4 5
-        // }
+        $userid =1;
+        $users =  UserModel::raw(
+            "SELECT users.id, users.username, MAX(messages.created_at) AS created_at
+        FROM users
+        INNER JOIN messages ON (users.id = messages.from OR users.id = messages.to)
+            AND (messages.from = ? OR messages.to = ?)
+        WHERE users.id != ?
+        GROUP BY users.id, users.username
+        ORDER BY created_at DESC",
+        [
+            $userid,
+            $userid,
+            $userid
+        ]
+        )->get();
+        echo json_encode($users,JSON_PRETTY_PRINT);
     }
 }
