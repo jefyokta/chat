@@ -27,7 +27,7 @@ class UserModel extends Database
         $users =  UserModel::raw(
             "SELECT users.id, users.username, MAX(messages.created_at) AS created_at
         FROM users
-        LEFT JOIN messages ON (users.id = messages.from OR users.id = messages.to)
+        INNER JOIN messages ON (users.id = messages.from OR users.id = messages.to)
             AND (messages.from = ? OR messages.to = ?)
         WHERE users.id != ?
         GROUP BY users.id, users.username

@@ -12,8 +12,17 @@ class Seeder
     {
         // Coroutine::create(function () {
         $user = UserModel::insertMany([
-            ["username" => "jefyokta", "password" => "123"],
-            ["username" => "jefyokta2", "password" => "123"],
+            // ["username" => "jefyokta", "password" => "123"],
+            // ["username" => "jefyokta2", "password" => "123"],
+            ["username" => "jefyokta3", "password" => "123"],
+            ["username" => "jefyokta4", "password" => "123"],
+            ["username" => "jefyokta5", "password" => "123"],
+            ["username" => "jefyokta6", "password" => "123"],
+            ["username" => "jefyokta7", "password" => "123"],
+            ["username" => "jefyokta8", "password" => "123"],
+            ["username" => "jefyokta9", "password" => "123"],
+            ["username" => "jefyokta10", "password" => "123"],
+            ["username" => "jefyokta11", "password" => "123"],
          
         ]);
         // $user =  UserModel::insert()->run(true);

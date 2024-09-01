@@ -33,7 +33,7 @@
             <div class="px-5 mb-3">
                 <h1 class="text-xl font-semibold text-cyan-200">Chats</h1>
             </div>
-            <ul class=" userlist max-w-md shadow-lg divide-y p-5 divide-gray-200 overflow-y-scroll relative bg-emerald-300/10 mx-2 rounded-md">
+            <ul class=" userlist max-w-md shadow-lg divide-y p-5 divide-gray-200 overflow-y-scroll relative bg-emerald-300/10 mx-2 rounded-md" id="userlist">
 
                 <?php foreach ($users as $user): ?>
                     <a href="/messages?with=<?= htmlspecialchars($user['id']) ?>" class="pb-3 sm:pb-4" id="user<?= $user['id'] ?>">
@@ -354,8 +354,10 @@
                 const myid = <?= $userid ?>;
                 const fromUserId = data.from;
                 const toUserId = data.to;
+                const mynode = `user${myid}`;
 
-                if (fromUserId !== myid || toUserId !== myid) {
+                if (fromUserId !== mynode) {
+                    // console.log("bukan dari saya");
                     const box = document.getElementById(fromUserId);
 
                     if (box) {
@@ -369,8 +371,25 @@
                             console.error("Container tidak ditemukan untuk elemen dengan id" + fromUserId + "'");
                         }
                     } else {
-                        console.error("Elemen dengan id " + fromUserId + "' tidak ditemukan");
+                        // console.error("Elemen dengan id " + fromUserId + "' tidak ditemukan");
+
+                        const parent = document.getElementById('userlist')
+                        const parentOldhtml = parent.innerHTML;
+                        const newnode = `<a href="/messages?with=${fromUserId.replace('user','')}" class="pb-3 sm:pb-4" id="${fromUserId}">
+                        <div class="flex my-1 items-center space-x-4 p-2 px-4 hover:shadow hover:bg-slate-200/10 hover:rounded-md border-cyan-200/30 border-b-2" style="border-bottom-width: 1px;">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-200 truncate">user${fromUserId.replace('user','')}</p>
+                                <p class="text-sm text-gray-500 truncate">#${fromUserId.replace('user','')}</p>
+                            </div>
+                        </div>
+                    </a>`
+
+                        parent.innerHTML = newnode + parentOldhtml
+                        showAlert("Hei There a new Message!", false)
+
                     }
+                } else {
+                    console.log("seharunsya bukan saya")
                 }
             }
 

@@ -39,8 +39,10 @@ $route->path('message', function (Server $server, Frame $frame, array $data) use
                 $clients = $clientStorage->loadClients();
                 sendMessage($server, $to, WebsocketResponse($message, 'message'), $clients, $clientStorage);
                 sendMessage($server, $from, WebsocketResponse($message, 'message'), $clients, $clientStorage);
+
                 sendMessage($server, $to, WebsocketResponse(["from" => "user$from", "to" => "user$to"], 'new'), $clients, $clientStorage);
                 sendMessage($server, $from, WebsocketResponse(["from" => "user$from", "to" => "user$to"], 'new'), $clients, $clientStorage);
+                
             } catch (\Exception $e) {
                 $pdo->rollBack();
                 $server->push($frame->fd, json_encode(WebsocketResponse([], 'error', 'internal server error')));
