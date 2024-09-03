@@ -12,8 +12,8 @@ class Seeder
     {
         // Coroutine::create(function () {
         $user = UserModel::insertMany([
-            // ["username" => "jefyokta", "password" => "123"],
-            // ["username" => "jefyokta2", "password" => "123"],
+            ["username" => "jefyokta", "password" => "123"],
+            ["username" => "jefyokta2", "password" => "123"],
             ["username" => "jefyokta3", "password" => "123"],
             ["username" => "jefyokta4", "password" => "123"],
             ["username" => "jefyokta5", "password" => "123"],
@@ -26,7 +26,7 @@ class Seeder
          
         ]);
         // $user =  UserModel::insert()->run(true);
-        // $msg = MessageModel::insert(["message" => "hi", "from" => 2, "to" => 1, "id" => uniqid()])->run(true);
+        $msg = MessageModel::insert(["message" => "hi", "from" => 2, "to" => 1, "id" => uniqid()])->run(true);
         // // var_dump($user);
         // // var_dump($msg);
         // // echo "async\n";

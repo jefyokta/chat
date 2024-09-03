@@ -23,3 +23,4 @@ const getCookie = (name) => {
   }
   return null;
 };
+

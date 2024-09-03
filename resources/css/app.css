@@ -8,6 +8,16 @@
         opacity: 1;
     }
 }
+@keyframes slideInY {
+    from {
+        transform: translateY(20%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
 
 @keyframes slideOut {
     from {
@@ -20,6 +30,11 @@
     }
 }
 
+#chatapp{
+  animation: slideInY 1.5s forwards;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+
+}
 .toast {
     animation: slideIn 0.5s forwards;
     transition: transform 0.3s ease-out, opacity 0.3s ease-out;

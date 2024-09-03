@@ -118,14 +118,17 @@ class Auth
 
             $user = UserModel::select("*")->where("username", '=', $r['username'])->first();
 
-            if (isset($user->scalar) && !$user->scalar) {
+            if (!isset($user->username) ) {
                 $res->header('content-type', 'application/json');
+                $res->status(401);
+
                 $res->end(json_encode(['error' => 'Unauthorized']));
                 return;
             }
 
             if ($user->password !== $r['password']) {
                 $res->header('content-type', 'application/json');
+                $res->status(401);
                 $res->end(json_encode(['error' => 'Invalid credentials']));
                 return;
             }

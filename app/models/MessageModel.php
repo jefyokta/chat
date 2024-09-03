@@ -13,7 +13,7 @@ class MessageModel extends Database
         "message" => "TEXT",
         "`from`" => "INT NULL",
         "`to`" => "INT NULL",
-        "created_at" => "DATETIME DEFAULT CURRENT_TIMESTAMP"
+        "created_at" => "DATETIME DEFAULT CURRENT_TIMESTAMP",
     ];
     protected array $fillable = ["message", "from", "to"];
     public $name = 'messages';

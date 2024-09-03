@@ -16,6 +16,7 @@ use Swoole\Http\Request;
 use Swoole\Http\Response;
 use oktaa\SwooleApp\App;
 use Swoole\Coroutine;
+use Swoole\Coroutine\Channel;
 
 $logMiddleware = function (Request $request, Response $response, $next) {
     $query = $request->get;
@@ -27,29 +28,68 @@ $logMiddleware = function (Request $request, Response $response, $next) {
         $queryurl = rtrim($queryurl, '&');
         $queryurl = '?' . $queryurl;
     }
+
     try {
         $next();
-        $text = "[" . date("d/m/Y H:i") . "] " . $request->server['remote_addr'] . ":  " . $request->server['request_method'] . " " . $request->server['request_uri'] . $queryurl;
+        $text = "[" . date("d/m/Y H:i") . "] " . $request->server['remote_addr'] . ": " . $request->server['request_method'] . " " . $request->server['request_uri'] . $queryurl;
         Console::log($text);
         Coroutine::writeFile(__DIR__ . "/../storage/logs/logs", $text . PHP_EOL, FILE_APPEND);
     } catch (\Throwable $th) {
-        // echo json_encode($th);
-        $text = "[" . date("d/m/Y H:i") . "] " . $request->server['remote_addr'] . ":  " . $request->server['request_method'] . " " . $request->server['request_uri'] . $queryurl;
-        Coroutine::writeFile(__DIR__ . "/../storage/logs/error_logs", $text . "  " . $th->getMessage() . PHP_EOL, FILE_APPEND);
-        $file =  Coroutine::readFile($th->getFile()) ?: null;
-        $filelines = explode("\n", $file) ?: null;
-        $errorline = is_array($filelines) ? $filelines[$th->getLine() - 1] : "unknown";
+        $text = "[" . date("d/m/Y H:i") . "] " . $request->server['remote_addr'] . ": " . $request->server['request_method'] . " " . $request->server['request_uri'] . $queryurl;
+        Coroutine::writeFile(__DIR__ . "/../storage/logs/error_logs", $text . " " . $th->getMessage() . PHP_EOL, FILE_APPEND);
+
+        // Cek apakah file kesalahan ada dan baca isinya
+        $filePath = $th->getFile();
+        $errorline = 'unknown';
+
+        if ($filePath && file_exists($filePath)) {
+            $file = Coroutine::readFile($filePath);
+            if ($file) {
+                $filelines = explode("\n", $file);
+                if (isset($filelines[$th->getLine() - 1])) {
+                    $errorline = $filelines[$th->getLine() - 1];
+                }
+            }
+        }
+
         Console::error($th->getMessage());
         render($response, 'error/error', [
             "code" => $th->getCode(),
             "message" => $th->getMessage(),
             "line" => $th->getLine(),
-            "trace" => $th->getTrace(),
-            "file" => $th->getFile() ?: null,
-            "errorline" => $errorline ?? null
+            "trace" => $th->getTraceAsString(),
+            "file" => $filePath ?: "unknown",
+            "errorline" => $errorline,
+            'req' => $request
+        ]);
+    } catch (\Exception $e) {
+        $text = "[" . date("d/m/Y H:i") . "] " . $request->server['remote_addr'] . ": " . $request->server['request_method'] . " " . $request->server['request_uri'] . $queryurl;
+        Coroutine::writeFile(__DIR__ . "/../storage/logs/error_logs", $text . " " . $e->getMessage() . PHP_EOL, FILE_APPEND);
+        $filePath = $e->getFile();
+        $errorline = 'unknown';
+
+        if ($filePath && file_exists($filePath)) {
+            $file = Coroutine::readFile($filePath);
+            if ($file) {
+                $filelines = explode("\n", $file);
+                if (isset($filelines[$e->getLine() - 1])) {
+                    $errorline = $filelines[$e->getLine() - 1];
+                }
+            }
+        }
+
+        Console::error($e->getMessage());
+        render($response, 'error/error', [
+            "code" => $e->getCode(),
+            "message" => $e->getMessage(),
+            "line" => $e->getLine(),
+            "trace" => $e->getTraceAsString(),
+            "file" => $filePath ?: "unknown",
+            "errorline" => $errorline
         ]);
     }
 };
+
 $hosts = explode("//", config('app.url'))[1];
 $hosts = explode(":", $hosts);
 $port = $hosts[1];
@@ -75,6 +115,23 @@ $app->post('/login', function (Request $req, Response $res) {
     Au::Login($req, $res);
 }, [$auth->guestVerify]);
 
+$app->get("/api/messages", function (Request $req, Response $res, $user) {
+    $res->header('content-type', 'application/json');
+    $theirid = isset($req->get['with']) ? $req->get['with'] : null;
+
+    if (empty($theirid)) {
+        $res->setStatusCode(404);
+        $res->end();
+        // return $res;
+    }
+    $messages =  MessageModel::raw("SELECT * FROM messages
+    WHERE (messages.from = ? OR messages.from = ?)
+    AND (messages.to = ? OR messages.to = ?)
+    ORDER BY created_at ASC", [$user->id, $theirid, $user->id, $theirid])->get();
+    $they = UserModel::select("*")->where("id", "=", $theirid)->first();
+
+    SendJson($res, ["messages" => $messages, "user" => ["id" => $they->id, "username" => $they->username]]);
+}, [$auth->tokenVerify]);
 
 $app->get("/register", function ($req, $res) {
     render($res, "register");
@@ -105,11 +162,7 @@ $app->get("/messages", function (Request $req, Response $res, $user) {
     WHERE (messages.from = ? OR messages.from = ?)
     AND (messages.to = ? OR messages.to = ?)
     ORDER BY created_at ASC", [$user->id, $theirid, $user->id, $theirid])->get();
-    // MessageModel::select("*")
-    //     ->where("messages.from", "=", $user->id)
-    //     ->orWhere("messages.from", "=", $theirid)
-    //     ->orWhere("messages.to", "=", $user->id)
-    //     ->orWhere("messages.to", "=", $theirid)->OrderBy("created_at", OrderByType::ASC)->get();
+
     render($res, "index", [
         "userid" => $user->id,
         "messages" => $messages,
@@ -180,8 +233,8 @@ $app->post("/register", function (Request $req, Response $res) {
     if (!isset($body['username'], $body['password'])) {
         $res->status(400);
         $res->end();
-    } else {
-
+    }
+    try {
         $user = UserModel::find($body['username']);
         if ($user) {
             $res->status(400);
@@ -192,13 +245,21 @@ $app->post("/register", function (Request $req, Response $res) {
             $res->status(200);
             SendJson($res, ApiResponse(["oke"]));
         } else {
+            $res->status(400);
             SendJson($res, ApiResponse(["not ok"]));
         }
+    } catch (\Throwable $th) {
+        $res->status(500);
+        $res->end('internal server error');
     }
 }, [$auth->guestVerify]);
 
 $app->delete("/logout", function ($req, $res) {
     SendJson($res, ApiResponse([], "null"));
 }, [$auth->logout]);
+
+
+
+
 
 $app->start();
