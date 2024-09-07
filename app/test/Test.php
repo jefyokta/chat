@@ -10,15 +10,17 @@ class Test
 {
     public function run()
     {
-        Coroutine::run(function () {
+        $mid = ['mid1', 'mid2'];
 
-            go(function () {
-                echo "1\n";
-                Coroutine::sleep(1);
-                echo "2\n";
-            });
-            
-            echo "1.5\n";
-        });
+        $mids = array_merge($mid, [
+            function () {
+                echo "test";
+            }
+        ]);
+
+        var_dump(array_shift($mids));
+        var_dump($mids);
+        
+        
     }
 }

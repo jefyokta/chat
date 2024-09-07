@@ -74,6 +74,8 @@ class App
                 $this->processRequest($request, $response, $method, $path, $next);
             }
         ]);
+        // var_dump($middlewareStack);
+        
 
         $this->runMiddlewareStack($middlewareStack, $request, $response);
     }
