@@ -1,5 +1,5 @@
 const userId = 2;
-const socket = new WebSocket('ws://localhost:9502');
+const socket = new WebSocket('ws://192.168.180.77:9502');
 
 socket.onopen = function() {
     const userId = '12345';

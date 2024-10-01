@@ -7,16 +7,13 @@ require_once __DIR__ . "/../app/middleware/ErrorHandler.php";
 require_once __DIR__ . "/../app/http/Responses.php";
 
 use oktaa\console\Console;
-use oktaa\Database\Interfaces\OrderByType;
 use oktaa\middlewareSwoole\Auth as Au;
 use oktaa\model\MessageModel;
 use oktaa\model\UserModel;
-use oktaa\Swoole\Error\ErrorHandler;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use oktaa\SwooleApp\App;
 use Swoole\Coroutine;
-use Swoole\Coroutine\Channel;
 
 $logMiddleware = function (Request $request, Response $response, $next) {
     $query = $request->get;
@@ -89,6 +86,12 @@ $logMiddleware = function (Request $request, Response $response, $next) {
         ]);
     }
 };
+$skip = function (Request $request, Response $response, $next) {
+
+    $response->header("ngrok-skip-browser-warning", true);
+    $request->header["ngrok-skip-browser-warning"] = true;
+    $next();
+};
 
 $hosts = explode("//", config('app.url'))[1];
 $hosts = explode(":", $hosts);
@@ -98,7 +101,10 @@ $host = $hosts[0];
 $app = new App($host, $port);
 
 
-$app->use($logMiddleware);
+// $app->use($logMiddleware);
+$app->use($skip);
+
+
 
 
 $app->get("/login", function (Request $request, Response $response) {

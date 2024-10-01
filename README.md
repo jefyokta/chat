@@ -52,9 +52,7 @@ php okta generate-keys
 php okta start
 ```
 
-```
-php okta ws
-```
+
 
 ## done !
 

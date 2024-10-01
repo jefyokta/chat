@@ -125,7 +125,7 @@
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const socket = new WebSocket('ws://<?= config('ws.host') ?>:<?= config("ws.port") ?>');
+        const socket = new WebSocket('ws://localhost:8000');
         const token = getCookie('X-ChatAppAccessToken') || null;
 
 

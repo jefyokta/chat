@@ -68,7 +68,7 @@ $route->path('auth', function (Server $server, Frame $frame, array $data) use ($
  * ========================
  */
 
-$server = new Server(config('ws.host'), config('ws.port'));
+$server = require __DIR__."/../app/getServer.php";
 
 $server->on('open', function (Server $server, Request $request) use ($clientStorage) {
     echo "Connection open: FD: {$request->fd}\n";

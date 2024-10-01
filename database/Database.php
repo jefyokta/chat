@@ -2,6 +2,7 @@
 
 namespace oktaa\Database;
 
+use Cli;
 use Swoole\Runtime;
 
 // Runtime::enableCoroutine(true, SWOOLE_HOOK_ALL);
@@ -37,6 +38,22 @@ abstract class Database
         $this->port = config('db.port');
 
         try {
+
+            $dsn = sprintf("%s:host=%s;port=%d", config('db.connection'), $this->host, $this->port);
+            $pdo = new PDO($dsn, $this->user, $this->password);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+
+            $stmt = $pdo->query("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '$this->db'");
+            $databaseExists = $stmt->fetchColumn();
+
+            if (!$databaseExists) {
+                Cli::info(" Database " . $this->db . " doesnt exist \n");
+                Cli::info(" Creating......\n");
+                $pdo->exec("CREATE DATABASE `$this->db`");
+                Cli::success(" Database " . $this->db . " creadted \n");
+            }
+
             $this->dbh = new PDO(config('db.connection') . ":host=$this->host;port=$this->port;dbname=$this->db", $this->user, $this->password);
             $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {

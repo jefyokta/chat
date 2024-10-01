@@ -2,11 +2,22 @@
 
 namespace oktaa\SwooleApp;
 
-use Swoole\Http\Server;
+require __DIR__."/../websocket/Routing.php";
+
+require __DIR__."/../Storage/Clients.php";
+require __DIR__."/getServer.php";
+use Auth;
+use Swoole\WebSocket\Server;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
+use Swoole\WebSocket\Frame;
 use oktaa\console\Console;
+use oktaa\model\MessageModel;
+use oktaa\model\UserModel;
+use oktaa\Storage\ClientStorage;
+use oktaa\websocket\Routing;
 use Swoole\Coroutine;
+
 
 class App
 {
@@ -24,8 +35,47 @@ class App
         $this->server->on("request", function (Request $request, Response $response) {
             $this->handleRequest($request, $response);
         });
-    }
 
+        $this->server->on('open', function (Server $server, Request $request) {
+            Console::info("WebSocket connection opened: {$request->fd}");
+        });
+
+        $route = $this->webSocketRouting()["route"];
+        $clientStorage = $this->webSocketRouting()["clientStorage"];
+        $this->server->on('message', function (Server $server, Frame $frame) use ($clientStorage, &$route) {
+            echo "Message received from FD: {$frame->fd}\n";
+            $messageData = json_decode($frame->data, true);
+        
+            if ($messageData === null && json_last_error() !== JSON_ERROR_NONE) {
+                $server->push($frame->fd, json_encode(['error' => 'Invalid JSON format', 'data' => []]));
+                return;
+            }
+        
+            if (isset($messageData['token'])) {
+                $userid = Auth::decodeToken($messageData['token']);
+                if (!$userid) {
+                    $server->push($frame->fd, json_encode([
+                        'type' => 'error',
+                        'error' => 'Invalid token',
+                        'data' => []
+                    ]));
+                    return;
+                }
+        
+                $data = $messageData['data'] ?? [];
+                $data['from'] = $userid['id'];
+                $clients = $clientStorage->loadClients();
+                addClient($frame->fd, $data['from'], $clients, $clientStorage);
+                $route->run($server, $frame, $data);
+            } else {
+                $server->push($frame->fd, json_encode(WebsocketResponse([], 'error', 'invalid credential')));
+            }
+        });
+
+        $this->server->on('close', function (Server $server, int $fd) {
+            Console::info("WebSocket connection closed: {$fd}");
+        });
+    }
     public function route($method, string $path, callable $handler, array $middleware = [])
     {
         $this->routes[$method][$path] = [
@@ -33,7 +83,7 @@ class App
             'middleware' => $middleware
         ];
     }
-    
+
 
     public function get(string $path, callable $handler, array $middleware = [])
     {
@@ -63,11 +113,11 @@ class App
     protected function handleRequest(Request $request, Response $response)
     {
         $method = $request->server['request_method'];
-    
+
         $path = $request->server['request_uri'];
         $path = filter_var($path, FILTER_SANITIZE_URL);
         // $path = rtrim($path,"/");
-        
+
 
         $middlewareStack = array_merge($this->middleware, [
             function ($request, $response, $next) use ($method, $path) {
@@ -75,7 +125,7 @@ class App
             }
         ]);
         // var_dump($middlewareStack);
-        
+
 
         $this->runMiddlewareStack($middlewareStack, $request, $response);
     }
@@ -88,7 +138,7 @@ class App
                 if (is_callable($middleware)) {
                     $middleware($request, $response, $next, $params);
                 } else {
-                    
+
                     Console::error("Middleware is not callable.");
                     $response->status(500);
                     $response->end("Internal Server Error");
@@ -108,14 +158,14 @@ class App
 
             $middlewareStack = array_merge($routeMiddleware, [
                 function ($request, $response, $next, $params = null) use ($handler) {
-                    $handler($request, $response, $params); 
+                    $handler($request, $response, $params);
                 }
             ]);
 
             $this->runMiddlewareStack($middlewareStack, $request, $response);
         } else {
             $response->status(404);
-            $page = Coroutine::readFile(__DIR__."/../../resources/views/error/404.php");
+            $page = Coroutine::readFile(__DIR__ . "/../../resources/views/error/404.php");
             $response->end($page);
         }
     }
@@ -123,5 +173,58 @@ class App
     public function start()
     {
         $this->server->start();
+    }
+
+    private function webSocketRouting()
+    {
+        $clientStorage = new ClientStorage();
+        $route = new Routing();
+        $route->path('message', function (Server $server, Frame $frame, array $data) use ($clientStorage, &$route) {
+            if (isset($data['to'], $data['message'])) {
+                $from = $data['from'];
+                $to = $data['to'];
+                $message = $data['message'];
+
+                Coroutine::create(function () use ($from, $to, $message, $server, $frame, $clientStorage, &$route) {
+                    $pdo = MessageModel::getPdo();
+                    try {
+                        $pdo->beginTransaction();
+                        $id = uniqid();
+                        MessageModel::insert([
+                            "id" => $id,
+                            'from' => $from,
+                            'to' => $to,
+                            'message' => $message
+                        ])->run();
+                        $pdo->commit();
+
+                        $message = MessageModel::find($id);
+                        $message->created_at = MessageTime($message->created_at);
+                        $clients = $clientStorage->loadClients();
+                        sendMessage($server, $to, WebsocketResponse($message, 'message'), $clients, $clientStorage);
+                        sendMessage($server, $from, WebsocketResponse($message, 'message'), $clients, $clientStorage);
+
+                        sendMessage($server, $to, WebsocketResponse(["from" => "user$from", "to" => "user$to"], 'new'), $clients, $clientStorage);
+                        sendMessage($server, $from, WebsocketResponse(["from" => "user$from", "to" => "user$to"], 'new'), $clients, $clientStorage);
+                    } catch (\Exception $e) {
+                        $pdo->rollBack();
+                        $server->push($frame->fd, json_encode(WebsocketResponse([], 'error', 'internal server error')));
+                    }
+                });
+            } else {
+                $server->push($frame->fd, json_encode(WebsocketResponse([], 'error', 'invalid message data')));
+            }
+        });
+
+        $route->path('mymessage', function (Server $server, Frame $frame, array $data) {
+            $id = $data['id'];
+            UserModel::getMyMessage($id);
+        });
+
+        $route->path('auth', function (Server $server, Frame $frame, array $data) use ($clientStorage) {
+            Console::info("client added");
+        });
+
+        return compact("route","clientStorage");
     }
 }

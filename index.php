@@ -1,5 +1,5 @@
 <?php
-$name ="jefy okta";
+$name =              "jefy okta";
 $script = "<script>const name = 'jefyokta'</script>";
 function getUmur(){
     return 23;
