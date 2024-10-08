@@ -125,7 +125,11 @@
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const socket = new WebSocket('ws://localhost:8000');
+
+        const protocol = location.protocol === "http" ? "ws" : "wss"
+        const port = location.port
+        const fullWbsocketLocation = `${'ws'}://${location.hostname}:${port}/`
+        const socket = new WebSocket(fullWbsocketLocation);
         const token = getCookie('X-ChatAppAccessToken') || null;
 
 
@@ -322,7 +326,7 @@
                         if (myid == parseInt(id)) {
                             console.log("itu dari saya sendiri")
                             return
-                            
+
 
                         }
                         const parent = document.getElementById('userlist')
